@@ -357,6 +357,9 @@ DWREngine._finalize = function(batch)
     DWREngine._removeNode(batch.iframe);
     DWREngine._removeNode(batch.form);
 
+    // Avoid IE handles increase
+    delete batch.req;
+
     if (DWREngine._postHook)
     {
         DWREngine._postHook();
@@ -747,7 +750,7 @@ DWREngine._sendData = function(batch)
  */
 DWREngine._stateChange = function(batch)
 {
-    if (batch.req.readyState == 4)
+    if (batch.req.readyState == 4 && !batch.completed)
     {
         try
         {

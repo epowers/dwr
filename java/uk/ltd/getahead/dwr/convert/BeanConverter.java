@@ -188,9 +188,10 @@ public class BeanConverter implements Converter
                 String val = token.substring(colonpos + 1).trim();
 
                 PropertyDescriptor descriptor = (PropertyDescriptor) props.get(key);
-                if (descriptor == null)
+                Method setter = descriptor.getWriteMethod();
+                if (setter == null)
                 {
-                    log.warn("No setter for " + key); //$NON-NLS-1$
+                    log.warn("No visible setter for " + key); //$NON-NLS-1$
                     StringBuffer all = new StringBuffer();
                     for (Iterator it = props.keySet().iterator(); it.hasNext();)
                     {
@@ -209,7 +210,6 @@ public class BeanConverter implements Converter
                     String[] split = LocalUtil.splitInbound(val);
                     InboundVariable nested = new InboundVariable(iv.getLookup(), split[LocalUtil.INBOUND_INDEX_TYPE], split[LocalUtil.INBOUND_INDEX_VALUE]);
 
-                    Method setter = descriptor.getWriteMethod();
                     inctx.pushContext(setter, 0);
                     Object output = config.convertInbound(propType, nested, inctx);
                     inctx.popContext(setter, 0);
