@@ -9,13 +9,14 @@ import uk.ltd.getahead.dwr.InboundContext;
 import uk.ltd.getahead.dwr.InboundVariable;
 import uk.ltd.getahead.dwr.Messages;
 import uk.ltd.getahead.dwr.OutboundContext;
+import uk.ltd.getahead.dwr.compat.BaseV10Converter;
 import uk.ltd.getahead.dwr.util.LocalUtil;
 
 /**
  * Converter for all primitive types
  * @author Joe Walker [joe at getahead dot ltd dot uk]
  */
-public class EnumConverter implements Converter
+public class EnumConverter extends BaseV10Converter implements Converter
 {
     /* (non-Javadoc)
      * @see uk.ltd.getahead.dwr.Converter#init(uk.ltd.getahead.dwr.DefaultConfiguration)
@@ -31,11 +32,10 @@ public class EnumConverter implements Converter
     {
         String value = LocalUtil.decode(iv.getValue());
 
-        // Object[] values = paramType.getEnumConstants();
         Object[] values = null;
         try
         {
-            Method getter = paramType.getMethod("getEnumConstants", null); //$NON-NLS-1$
+            Method getter = paramType.getMethod("values", new Class[0]); //$NON-NLS-1$
             values = (Object[]) getter.invoke(paramType, null);
         }
         catch (NoSuchMethodException ex)

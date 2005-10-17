@@ -7,6 +7,7 @@ import uk.ltd.getahead.dwr.InboundContext;
 import uk.ltd.getahead.dwr.InboundVariable;
 import uk.ltd.getahead.dwr.Messages;
 import uk.ltd.getahead.dwr.OutboundContext;
+import uk.ltd.getahead.dwr.compat.BaseV10Converter;
 import uk.ltd.getahead.dwr.util.JavascriptUtil;
 import uk.ltd.getahead.dwr.util.LocalUtil;
 
@@ -14,7 +15,7 @@ import uk.ltd.getahead.dwr.util.LocalUtil;
  * Converter for all primitive types
  * @author Joe Walker [joe at getahead dot ltd dot uk]
  */
-public class PrimitiveConverter implements Converter
+public class PrimitiveConverter extends BaseV10Converter implements Converter
 {
     /* (non-Javadoc)
      * @see uk.ltd.getahead.dwr.Converter#init(uk.ltd.getahead.dwr.DefaultConfiguration)

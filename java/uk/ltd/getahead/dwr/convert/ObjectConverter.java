@@ -19,6 +19,7 @@ import uk.ltd.getahead.dwr.InboundVariable;
 import uk.ltd.getahead.dwr.Messages;
 import uk.ltd.getahead.dwr.OutboundContext;
 import uk.ltd.getahead.dwr.OutboundVariable;
+import uk.ltd.getahead.dwr.compat.BaseV10Converter;
 import uk.ltd.getahead.dwr.util.LocalUtil;
 import uk.ltd.getahead.dwr.util.Logger;
 
@@ -26,7 +27,7 @@ import uk.ltd.getahead.dwr.util.Logger;
  * Convert a Javascript associative array into a JavaBean
  * @author Joe Walker [joe at getahead dot ltd dot uk]
  */
-public class ObjectConverter implements Converter
+public class ObjectConverter extends BaseV10Converter implements Converter
 {
     /**
      * Do we force accessibility for private fields

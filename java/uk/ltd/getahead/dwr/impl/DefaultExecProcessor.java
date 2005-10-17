@@ -116,7 +116,7 @@ public class DefaultExecProcessor implements Processor
             log.debug(reply);
 
             // LocalUtil.addNoCacheHeaders(resp);
-            resp.setContentType(calls.isXhrMode() ? HtmlConstants.MIME_XML : HtmlConstants.MIME_HTML);
+            resp.setContentType(calls.isXhrMode() ? HtmlConstants.MIME_PLAIN : HtmlConstants.MIME_HTML);
             PrintWriter out = resp.getWriter();
             out.print(reply);
             out.flush();

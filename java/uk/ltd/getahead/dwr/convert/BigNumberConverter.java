@@ -10,12 +10,13 @@ import uk.ltd.getahead.dwr.InboundContext;
 import uk.ltd.getahead.dwr.InboundVariable;
 import uk.ltd.getahead.dwr.Messages;
 import uk.ltd.getahead.dwr.OutboundContext;
+import uk.ltd.getahead.dwr.compat.BaseV10Converter;
 
 /**
  * Converter for all primitive types
  * @author Joe Walker [joe at getahead dot ltd dot uk]
  */
-public class BigNumberConverter implements Converter
+public class BigNumberConverter extends BaseV10Converter implements Converter
 {
     /* (non-Javadoc)
      * @see uk.ltd.getahead.dwr.Converter#init(uk.ltd.getahead.dwr.DefaultConfiguration)

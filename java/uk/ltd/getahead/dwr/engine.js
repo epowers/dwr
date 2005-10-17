@@ -1,6 +1,19 @@
+/*
+ * Copyright 2005 Joe Walker
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-// See: http://www.crockford.com/javascript/jslint.html
-/*global alert, window, document, navigator, DOMParser, XMLHttpRequest */
 
 /*
 TODO: put this documentation somewhere better
@@ -498,6 +511,15 @@ DWREngine._sendData = function(batch) {
     setTimeout(funcReq, batch.metadata.timeout);
   }
 
+  // A quick string to help people that use web log analysers
+  var statsInfo;
+  if (batch.map.callCount == 1) {
+    statsInfo = batch.map["c0-scriptName"] + "." + batch.map["c0-methodName"];
+  }
+  else {
+    statsInfo = "Multiple." + batch.map.callCount;
+  }
+
   // Get setup for XMLHttpRequest if possible
   if (batch.method == DWREngine.XMLHttpRequest) {
     if (window.XMLHttpRequest) {
@@ -507,15 +529,6 @@ DWREngine._sendData = function(batch) {
     else if (window.ActiveXObject && !(navigator.userAgent.indexOf('Mac') >= 0 && navigator.userAgent.indexOf("MSIE") >= 0)) {
       batch.req = DWREngine._newActiveXObject(DWREngine._XMLHTTP);
     }
-  }
-
-  // A quick string to help people that use web log analysers
-  var statsInfo;
-  if (batch.map.callCount == 1) {
-    statsInfo = batch.map["c0-scriptName"] + "." + batch.map["c0-methodName"];
-  }
-  else {
-    statsInfo = "Multiple." + batch.map.callCount;
   }
 
   var query = "";
@@ -559,9 +572,10 @@ DWREngine._sendData = function(batch) {
       }
 
       try {
-        // Prototype does the following, why?
-        // batch.req.setRequestHeader('Connection', 'close');
-        // batch.req.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        // This might include Safari too, but it shouldn't do any harm
+//        if (navigator.userAgent.indexOf('Gecko') >= 0) {
+//          batch.req.setRequestHeader('Connection', 'close');
+//        }
         batch.req.open("POST", batch.path + "/exec/" + statsInfo, batch.asynchronous);
         batch.req.send(query);
       }
@@ -619,8 +633,15 @@ DWREngine._stateChange = function(batch) {
     try {
       var reply = batch.req.responseText;
       if (reply != null && reply != "") {
-        if (batch.req.status && batch.req.status == 200) eval(reply);
-        else DWREngine._stateChangeError(batch, reply);
+        if (reply.search("DWREngine._handle") == -1) {
+          DWREngine._stateChangeError(batch, "Invalid reply from server");
+        }
+        else if (batch.req.status && batch.req.status == 200) {
+          eval(reply);
+        }
+        else {
+          DWREngine._stateChangeError(batch, reply);
+        }
       }
       else {
         DWREngine._stateChangeError(batch, "No data received from server");
@@ -681,9 +702,7 @@ DWREngine._stateChangeError = function(batch, message) {
  */ 
 DWREngine._abortRequest = function(batch) {
   if (batch && batch.metadata && !batch.completed) {
-    // TODO: we used to do: batch.completed = true;
-    // here, but decided to leave it to DWREngine._stateChange() to handle
-    // when abort is called. This comment can be deleted if this works!
+    batch.completed = true;
     if (batch.req != null) {
       batch.req.abort();
       if (batch.metadata.errorHandler) {
@@ -693,7 +712,7 @@ DWREngine._abortRequest = function(batch) {
         //  eval(batch.metadata.errorHandler); 
         //}
         //else if (typeof batch.metadata.errorHandler == "function") {
-          batch.metadata.errorHandler(); 
+        batch.metadata.errorHandler(); 
         //}
         //else {
         //  if (DWREngine._warningHandler) {
