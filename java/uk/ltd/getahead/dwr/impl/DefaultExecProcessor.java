@@ -102,8 +102,6 @@ public class DefaultExecProcessor implements Processor
                     buffer.append(call.getId());
                     buffer.append("', "); //$NON-NLS-1$
                     buffer.append(ov.getAssignCode());
-                    buffer.append(", "); //$NON-NLS-1$
-                    buffer.append("batch"); //$NON-NLS-1$
                     buffer.append(");\n"); //$NON-NLS-1$
                 }
                 else
