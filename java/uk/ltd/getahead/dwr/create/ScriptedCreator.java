@@ -58,7 +58,7 @@ public class ScriptedCreator extends AbstractCreator implements Creator
      * check to see if the script has been modified before returning the
      * existing created class.
      */
-    public void setCacheScript(String reloadable)
+    public void setReloadable(String reloadable)
     {
         this.reloadable = Boolean.valueOf(reloadable).booleanValue();
     }
@@ -97,6 +97,22 @@ public class ScriptedCreator extends AbstractCreator implements Creator
     }
 
     /**
+     * @return Whether or not the script (located at scriptPath) has been modified.
+     */
+    private boolean scriptUpdated()
+    {
+        if (null == scriptPath)
+        {
+            return false;
+        }
+
+        ExecutionContext ec = ExecutionContext.get();
+        ServletContext sc = ec.getServletContext();
+        File scriptFile = new File(sc.getRealPath(scriptPath));
+        return scriptModified < scriptFile.lastModified();
+    }
+
+    /**
      * @return Returns the script.
      * @throws InstantiationException 
      */
@@ -112,11 +128,6 @@ public class ScriptedCreator extends AbstractCreator implements Creator
             throw new InstantiationException(Messages.getString("ScriptedCreator.MissingScript")); //$NON-NLS-1$
         }
 
-        if (!reloadable && cachedScript != null)
-        {
-            return cachedScript;
-        }
-
         try
         {
             // load the script from the path
@@ -129,20 +140,11 @@ public class ScriptedCreator extends AbstractCreator implements Creator
                 ServletContext sc = ec.getServletContext();
                 File scriptFile = new File(sc.getRealPath(scriptPath));
 
-                // check for modified script
-                if (scriptFile.lastModified() <= scriptModified && cachedScript != null)
-                {
-                    log.debug("Script: " + scriptPath + " not modified."); //$NON-NLS-1$ //$NON-NLS-2$
-                    return cachedScript;
-                }
-
                 scriptModified = scriptFile.lastModified();
                 in = new RandomAccessFile(scriptFile, "r"); //$NON-NLS-1$
                 byte bytes[] = new byte[(int) in.length()];
                 in.readFully(bytes);
-                cachedScript = new String(bytes);
-                return cachedScript;
-
+                return new String(bytes);
             }
             finally
             {
@@ -198,7 +200,7 @@ public class ScriptedCreator extends AbstractCreator implements Creator
      */
     public Class getType()
     {
-        if (clazz == null || (scriptPath != null && reloadable))
+        if (clazz == null || (reloadable && scriptUpdated()))
         {
             try
             {
@@ -271,8 +273,4 @@ public class ScriptedCreator extends AbstractCreator implements Creator
      */
     private long scriptModified = -1;
 
-    /**
-     * Contents of script loaded from scriptPath
-     */
-    private String cachedScript;
 }
