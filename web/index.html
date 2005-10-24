@@ -6,35 +6,28 @@
   <script type='text/javascript' src='dwr/engine.js'></script>
   <script type='text/javascript' src='dwr/util.js'></script>
   <script>
-    function init()
-    {
-        // This turns off the no-javascript message
-        document.getElementById("start").style.display = "none";
-
-        // This checks for file: URLs and loading problems
-        if (window.DWREngine == null || window.DWRUtil == null)
-        {
-            document.getElementById("file").style.display = "block";
-            return;
-        }
-
-        // DWR setup
-        DWREngine.setErrorHandler(function(message) { alert(message); });
-        DWREngine.setWarningHandler(function(message) { alert(message); });
-        DWRUtil.useLoadingMessage();
-
-        // Turn on the generic error div
-        $("error").style.display = "block";
-
-        // Load a message from the server
-        Test.getInsert(load);
+    function init() {
+      // This turns off the no-javascript message
+      document.getElementById("start").style.display = "none";
+      // This checks for file: URLs and loading problems
+      if (window.DWREngine == null || window.DWRUtil == null) {
+        document.getElementById("file").style.display = "block";
+        return;
+      }
+      // DWR setup
+      DWREngine.setErrorHandler(function(message) { alert(message); });
+      DWREngine.setWarningHandler(function(message) { alert(message); });
+      DWRUtil.useLoadingMessage();
+      // Turn on the generic error div
+      $("error").style.display = "block";
+      // Load a message from the server
+      Test.getInsert(load);
     }
 
-    function load(data)
-    {
-        $("error").style.display = "none";
-        DWRUtil.setValue("reply", data);
-        $("reply").style.display = "block";
+    function load(data) {
+      $("error").style.display = "none";
+      DWRUtil.setValue("reply", data);
+      $("reply").style.display = "block";
     }
   </script>
 </head>

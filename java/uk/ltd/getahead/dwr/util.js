@@ -314,9 +314,7 @@ DWRUtil.setValue = function(ele, val) {
 
   if (DWRUtil._isHTMLElement(ele, "select")) {
     if (ele.type == "select-multiple" && DWRUtil._isArray(val)) {
-      for (i = 0; i < val.length; i++) {
-        DWRUtil._selectListItem(ele, val[i]);
-      }
+      DWRUtil._selectListItems(ele, val);
     }
     else {
       DWRUtil._selectListItem(ele, val);
@@ -368,6 +366,37 @@ DWRUtil.setValue = function(ele, val) {
 };
 
 /**
+ * Find multiple items in a select list and make them selected
+ * @param ele The select list item
+ * @param val The array of values to select
+ */
+DWRUtil._selectListItems = function(ele, val) {
+  // We deal with select list elements by selecting the matching option
+  // Begin by searching through the values
+  var found  = false;
+  var i;
+  var j;
+  for (i = 0; i < ele.options.length; i++) {
+    ele.options[i].selected = false;
+    for (j = 0; j < val.length; j++) {
+      if (ele.options[i].value == val[j]) {
+        ele.options[i].selected = true;
+      }
+    }
+  }
+  // If that fails then try searching through the visible text
+  if (found) return;
+
+  for (i = 0; i < ele.options.length; i++) {
+    for (j = 0; j < val.length; j++) {
+      if (ele.options[i].text == val[j]) {
+        ele.options[i].selected = true;
+      }
+    }
+  }
+};
+
+/**
  * Find an item in a select list and make it selected
  * @param ele The select list item
  * @param val The value to select
@@ -386,11 +415,8 @@ DWRUtil._selectListItem = function(ele, val) {
       ele.options[i].selected = false;
     }
   }
-
   // If that fails then try searching through the visible text
-  if (found) {
-    return;
-  }
+  if (found) return;
 
   for (i = 0; i < ele.options.length; i++) {
     if (ele.options[i].text == val) {

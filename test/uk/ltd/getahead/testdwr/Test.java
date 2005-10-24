@@ -57,6 +57,21 @@ import uk.ltd.getahead.dwr.util.Logger;
 public class Test
 {
     /**
+     * 
+     */
+    public void throwNPE()
+    {
+        throw new NullPointerException();
+    }
+
+    /**
+     * 
+     */
+    public void doNothing()
+    {
+    }
+
+    /**
      * @return obja
      */
     public ObjA getLooped()

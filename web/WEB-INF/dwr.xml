@@ -13,6 +13,14 @@
       <param name="class" value="uk.ltd.getahead.testdwr.Test"/>
     </create>
 
+    <create creator="new" javascript="ApplicationTest" scope="application">
+      <param name="class" value="uk.ltd.getahead.testdwr.Test"/>
+    </create>
+
+    <create creator="new" javascript="SessionTest" scope="session">
+      <param name="class" value="uk.ltd.getahead.testdwr.Test"/>
+    </create>
+
     <create creator="new" javascript="JDate">
       <param name="class" value="java.util.Date"/>
       <exclude method="getHours"/>
