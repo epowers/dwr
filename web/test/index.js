@@ -6,7 +6,7 @@ function init() {
 }
 
 function test1() {
-  Test.doNothing();
+  Test.booleanParam(null, true);
 }
 
 function results(message) {
