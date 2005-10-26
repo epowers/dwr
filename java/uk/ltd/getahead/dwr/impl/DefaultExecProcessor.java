@@ -18,8 +18,6 @@ package uk.ltd.getahead.dwr.impl;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Iterator;
-import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -28,12 +26,10 @@ import javax.servlet.http.HttpServletResponse;
 import uk.ltd.getahead.dwr.AccessControl;
 import uk.ltd.getahead.dwr.Call;
 import uk.ltd.getahead.dwr.Calls;
-import uk.ltd.getahead.dwr.ClientScript;
 import uk.ltd.getahead.dwr.ConverterManager;
 import uk.ltd.getahead.dwr.CreatorManager;
 import uk.ltd.getahead.dwr.OutboundVariable;
 import uk.ltd.getahead.dwr.Processor;
-import uk.ltd.getahead.dwr.WebContextFactory;
 import uk.ltd.getahead.dwr.util.Logger;
 
 /**
@@ -76,15 +72,6 @@ public class DefaultExecProcessor implements Processor
             if (!calls.isXhrMode())
             {
                 buffer.append("<script type='text/javascript'>\n"); //$NON-NLS-1$
-            }
-
-            // Are there any outstanding reverse-ajax scripts to be passed on? 
-            List scripts = WebContextFactory.get().getBrowser().removeAllScripts();
-            for (Iterator it = scripts.iterator(); it.hasNext();)
-            {
-                ClientScript script = (ClientScript) it.next();
-                buffer.append(script);
-                buffer.append('\n');
             }
 
             // Now pass on the executed method responses

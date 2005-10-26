@@ -31,13 +31,6 @@ import javax.servlet.http.HttpSession;
 public interface WebContext
 {
     /**
-     * Get a browser object that we can use to identify this user across
-     * separate requests.
-     * @return A browser object for this user
-     */
-    Browser getBrowser();
-
-    /**
      * Accessor for the IoC container.
      * @return The IoC container that created the interface implementations.
      */

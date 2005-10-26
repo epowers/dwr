@@ -27,7 +27,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import uk.ltd.getahead.dwr.Browser;
 import uk.ltd.getahead.dwr.Container;
 import uk.ltd.getahead.dwr.WebContext;
 import uk.ltd.getahead.dwr.util.SwallowingHttpServletResponse;
@@ -54,22 +53,6 @@ public class DefaultWebContext implements WebContext
         this.config = config;
         this.context = context;
         this.container = container;
-    }
-
-    /* (non-Javadoc)
-     * @see uk.ltd.getahead.dwr.WebContext#getBrowser()
-     */
-    public Browser getBrowser()
-    {
-        HttpSession session = getSession();
-        Browser browser = (Browser) session.getAttribute(SESSION_BROWSER);
-        if (browser == null)
-        {
-            browser = new DefaultBrowser();
-            session.setAttribute(SESSION_BROWSER, browser);
-        }
-
-        return browser;
     }
 
     /* (non-Javadoc)
@@ -210,7 +193,6 @@ public class DefaultWebContext implements WebContext
     private static final String KEY_SCCINFO = "scc-info"; //$NON-NLS-1$
     private static final String KEY_ERROR = "error"; //$NON-NLS-1$
     private static final String VALUE_UNKNOWN = "unknown"; //$NON-NLS-1$
-    private static final String SESSION_BROWSER = "uk.ltd.getahead.dwr.browser"; //$NON-NLS-1$
 
     private static Properties props = null;
     private static final Object propLock = new Object();
