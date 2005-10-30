@@ -433,16 +433,14 @@ DWRUtil._selectListItem = function(ele, val) {
  * @param ele The id of the element or the HTML element itself
  */
 DWRUtil.getValue = function(ele) {
-  var nodes;
   var orig = ele;
   ele = $(ele);
-  // We can work with names and need to sometimes for radio buttons
-  if (ele == null) {
-    nodes = document.getElementsByName(orig);
-    if (nodes.length >= 1) {
+  // We can work with names and need to sometimes for radio buttons, and IE has
+  // an annoying bug where
+  var nodes = document.getElementsByName(orig);
+  if (ele == null && nodes.length >= 1) {
       ele = nodes.item(0);
     }
-  }
   if (ele == null) {
     alert("getValue() can't find an element with id/name: " + orig + ".");
     return "";
