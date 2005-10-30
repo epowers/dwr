@@ -128,7 +128,16 @@ public class ExecuteQuery
 
                     InboundVariable param = inctx.getParameter(callNum, j);
                     inctx.pushContext(method, j);
-                    params[j] = converterManager.convertInbound(paramType, param, inctx);
+
+                    try
+                    {
+                        params[j] = converterManager.convertInbound(paramType, param, inctx);
+                    }
+                    catch (ConversionException ex)
+                    {
+                        throw new ConversionException(Messages.getString("ExecuteQuery.ConversionError", call.getScriptName(), call.getMethodName(), ex.getMessage())); //$NON-NLS-1$
+                    }
+
                     inctx.popContext(method, j);
                 }
 
