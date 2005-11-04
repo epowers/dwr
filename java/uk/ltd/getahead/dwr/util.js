@@ -47,7 +47,7 @@ DWRUtil.selectRange = function(ele, start, end) {
   var orig = ele;
   ele = $(ele);
   if (ele == null) {
-    alert("selectRange() can't find an element with id: " + orig + ".");
+    DWRUtil.debug("selectRange() can't find an element with id: " + orig + ".");
     return;
   }
   if (ele.setSelectionRange) {
@@ -308,14 +308,14 @@ DWRUtil.setValue = function(ele, val) {
     }
   }
   if (ele == null) {
-    alert("setValue() can't find an element with id/name: " + orig + ".");
+    DWRUtil.debug("setValue() can't find an element with id/name: " + orig + ".");
     return;
   }
 
   if (DWRUtil._isHTMLElement(ele, "select")) {
     if (ele.type == "select-multiple" && DWRUtil._isArray(val)) {
       DWRUtil._selectListItems(ele, val);
-    }
+      }
     else {
       DWRUtil._selectListItem(ele, val);
     }
@@ -415,6 +415,7 @@ DWRUtil._selectListItem = function(ele, val) {
       ele.options[i].selected = false;
     }
   }
+
   // If that fails then try searching through the visible text
   if (found) return;
 
@@ -439,10 +440,10 @@ DWRUtil.getValue = function(ele) {
   // an annoying bug where
   var nodes = document.getElementsByName(orig);
   if (ele == null && nodes.length >= 1) {
-      ele = nodes.item(0);
-    }
+    ele = nodes.item(0);
+  }
   if (ele == null) {
-    alert("getValue() can't find an element with id/name: " + orig + ".");
+    DWRUtil.debug("getValue() can't find an element with id/name: " + orig + ".");
     return "";
   }
 
@@ -499,12 +500,12 @@ DWRUtil.getText = function(ele) {
   var orig = ele;
   ele = $(ele);
   if (ele == null) {
-    alert("getText() can't find an element with id: " + orig + ".");
+    DWRUtil.debug("getText() can't find an element with id: " + orig + ".");
     return "";
   }
 
   if (!DWRUtil._isHTMLElement(ele, "select")) {
-    alert("getText() can only be used with select elements. Attempt to use: " + DWRUtil._detailedTypeOf(ele) + " from  id: " + orig + ".");
+    DWRUtil.debug("getText() can only be used with select elements. Attempt to use: " + DWRUtil._detailedTypeOf(ele) + " from  id: " + orig + ".");
     return "";
   }
 
@@ -589,13 +590,13 @@ DWRUtil.addOptions = function(ele, data) {
   var orig = ele;
   ele = $(ele);
   if (ele == null) {
-    alert("addOptions() can't find an element with id: " + orig + ".");
+    DWRUtil.debug("addOptions() can't find an element with id: " + orig + ".");
     return;
   }
   var useOptions = DWRUtil._isHTMLElement(ele, "select");
   var useLi = DWRUtil._isHTMLElement(ele, ["ul", "ol"]);
   if (!useOptions && !useLi) {
-    alert("addOptions() can only be used with select elements. Attempt to use: " + DWRUtil._detailedTypeOf(ele));
+    DWRUtil.debug("addOptions() can only be used with select elements. Attempt to use: " + DWRUtil._detailedTypeOf(ele));
     return;
   }
   if (data == null) return;
@@ -641,7 +642,7 @@ DWRUtil.addOptions = function(ele, data) {
   {
     for (var prop in data) {
       if (!useOptions) {
-        alert("DWRUtil.addOptions can only create select lists from objects.");
+        DWRUtil.debug("DWRUtil.addOptions can only create select lists from objects.");
         return;
       }
       if (arguments[2]) {
@@ -678,13 +679,13 @@ DWRUtil.removeAllOptions = function(ele) {
   var orig = ele;
   ele = $(ele);
   if (ele == null) {
-    alert("removeAllOptions() can't find an element with id: " + orig + ".");
+    DWRUtil.debug("removeAllOptions() can't find an element with id: " + orig + ".");
     return;
   }
   var useOptions = DWRUtil._isHTMLElement(ele, "select");
   var useLi = DWRUtil._isHTMLElement(ele, ["ul", "ol"]);
   if (!useOptions && !useLi) {
-    alert("removeAllOptions() can only be used with select, ol and ul elements. Attempt to use: " + DWRUtil._detailedTypeOf(ele));
+    DWRUtil.debug("removeAllOptions() can only be used with select, ol and ul elements. Attempt to use: " + DWRUtil._detailedTypeOf(ele));
     return;
   }
   if (useOptions) {
@@ -732,11 +733,11 @@ DWRUtil.addRows = function(ele, data, cellFuncs, options) {
   var orig = ele;
   ele = $(ele);
   if (ele == null) {
-    alert("addRows() can't find an element with id: " + orig + ".");
+    DWRUtil.debug("addRows() can't find an element with id: " + orig + ".");
     return;
   }
   if (!DWRUtil._isHTMLElement(ele, ["table", "tbody", "thead", "tfoot"])) {
-    alert("addRows() can only be used with table, tbody, thead and tfoot elements. Attempt to use: " + DWRUtil._detailedTypeOf(ele));
+    DWRUtil.debug("addRows() can only be used with table, tbody, thead and tfoot elements. Attempt to use: " + DWRUtil._detailedTypeOf(ele));
     return;
   }
   if (!options) options = {};
@@ -813,11 +814,11 @@ DWRUtil.removeAllRows = function(ele) {
   var orig = ele;
   ele = $(ele);
   if (ele == null) {
-    alert("removeAllRows() can't find an element with id: " + orig + ".");
+    DWRUtil.debug("removeAllRows() can't find an element with id: " + orig + ".");
     return;
   }
   if (!DWRUtil._isHTMLElement(ele, ["table", "tbody", "thead", "tfoot"])) {
-    alert("removeAllRows() can only be used with table, tbody, thead and tfoot elements. Attempt to use: " + DWRUtil._detailedTypeOf(ele));
+    DWRUtil.debug("removeAllRows() can only be used with table, tbody, thead and tfoot elements. Attempt to use: " + DWRUtil._detailedTypeOf(ele));
     return;
   }
   while (ele.childNodes.length > 0) {
@@ -854,7 +855,7 @@ DWRUtil._isHTMLElement = function(ele, nodeName) {
       return match;
     }
 
-    alert("DWRUtil._isHTMLElement was passed test node name that is neither a string or array of strings");
+    DWRUtil.debug("DWRUtil._isHTMLElement was passed test node name that is neither a string or array of strings");
     return false;
   }
 
@@ -937,4 +938,10 @@ if (typeof document.importNode != "function") {
   document.importNode = function(importedNode, deep) {
     DWRUtil._importNode(this, importedNode, deep);
   };
+}
+/**
+ * Used internally when some message needs to get to the programmer
+ */
+DWRUtil.debug = function(message) {
+  alert(message);
 }
