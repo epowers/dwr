@@ -934,11 +934,7 @@ DWRUtil._importNode = function(doc, importedNode, deep) {
 
   return newNode;
 }
-if (typeof document.importNode != "function") {
-  document.importNode = function(importedNode, deep) {
-    DWRUtil._importNode(this, importedNode, deep);
-  };
-}
+
 /**
  * Used internally when some message needs to get to the programmer
  */
