@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import uk.ltd.getahead.dwr.Creator;
 import uk.ltd.getahead.dwr.WebContextFactory;
+import uk.ltd.getahead.dwr.util.Logger;
 
 /**
  * Page Flow Creator
@@ -97,26 +98,33 @@ public class PageFlowCreator extends AbstractCreator implements Creator
      */
     public Class getType()
     {
-        if (flowClass == null)
+        if (instanceType == null)
         {
-            if (bhFlowClass != null)
+            try
             {
-                flowClass = bhFlowClass;
+                instanceType = getInstance().getClass();
             }
-            else
+            catch (InstantiationException ex)
             {
-                flowClass = wlFlowClass;
+                log.error("Failed to instansiate object to detect type.", ex); //$NON-NLS-1$
+                return Object.class;
             }
         }
 
-        return flowClass;
+        return instanceType;
     }
+
+    /**
+     * The log stream
+     */
+    private static final Logger log = Logger.getLogger(PageFlowCreator.class);
+
+    private Class instanceType;
 
     private Method getter;
     private Method bhGetter;
     private Method wlGetter;
 
-    private Class flowClass;
     private Class bhFlowClass;
     private Class wlFlowClass;
 } 
