@@ -11,7 +11,7 @@
 		directly from Javascript. It gets rid of almost all the boiler
 		plate code between the web browser and your Java code.
 	</description>
-	<url>https://dwr.dev.java.net/</url>
+	<url>http://getahead.ltd.uk/dwr/</url>
 	<issueManagement>
 		<system>Java.net</system>
 		<url>https://dwr.dev.java.net/servlets/ProjectIssues</url>
