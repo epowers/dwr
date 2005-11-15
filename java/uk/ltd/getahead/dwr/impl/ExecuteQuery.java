@@ -515,7 +515,7 @@ public class ExecuteQuery
         OutboundVariable ov = new OutboundVariable();
         String varName = converted.getNextVariableName();
         ov.setAssignCode(varName);
-        ov.setInitCode("var " + varName + " = \"" + jsutil.escapeJavaScript(th.toString()) + "\";"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        ov.setInitCode("var " + varName + " = \"" + jsutil.escapeJavaScript(th.getMessage()) + "\";"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
         return ov;
     }
