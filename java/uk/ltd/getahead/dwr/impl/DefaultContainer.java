@@ -148,7 +148,7 @@ public class DefaultContainer implements Container
                             continue methods;
                         }
 
-                        log.debug("- skipped autowire: " + name); //$NON-NLS-1$ //$NON-NLS-2$
+                        log.debug("- skipped autowire: " + name); //$NON-NLS-1$
                     }
                 }
             }

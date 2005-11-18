@@ -325,7 +325,7 @@ public class ExecuteQuery
             {
                 if (log.isDebugEnabled())
                 {
-                    log.debug("GET line: " + key + '=' + array[0]); //$NON-NLS-1$ //$NON-NLS-2$
+                    log.debug("GET line: " + key + '=' + array[0]); //$NON-NLS-1$
                 }
 
                 convertedMap.put(key, array[0]);
@@ -402,7 +402,7 @@ public class ExecuteQuery
 
                 for (int i = 0; i < call.getInboundContext().getParameterCount(); i++)
                 {
-                    log.debug("  Param: " + i + '=' + call.getInboundContext().getParameter(callNum, i)); //$NON-NLS-1$ //$NON-NLS-2$
+                    log.debug("  Param: " + i + '=' + call.getInboundContext().getParameter(callNum, i)); //$NON-NLS-1$
                 }
             }
 
@@ -458,7 +458,6 @@ public class ExecuteQuery
                     call.getInboundContext().clearConverted();
 
                     // Check parameter types
-                    params:
                     for (int j = 0; j < methods[i].getParameterTypes().length; j++)
                     {
                         Class paramType = methods[i].getParameterTypes()[j];
