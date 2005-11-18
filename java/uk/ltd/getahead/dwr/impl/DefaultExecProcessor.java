@@ -57,7 +57,7 @@ public class DefaultExecProcessor implements Processor
                 }
                 else
                 {
-                    log.debug("Returning: id[" + call.getId() + "] assign[" + call.getReply().getAssignCode() + "] xhr[" + calls.isXhrMode() + ']'); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+                    log.debug("Returning: id[" + call.getId() + "] assign[" + call.getReply().getAssignCode() + "] xhr[" + calls.isXhrMode() + ']'); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                 }
             }
 
