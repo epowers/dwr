@@ -180,7 +180,17 @@ tests[tests.length] = { code:"intArrayParam", data:[ 2147483647 ] };
 tests[tests.length] = { code:"intArrayParam", data:[ -2147483648, -1, 0, 1, 2147483647 ] };
 tests[tests.length] = { code:"longArrayParam", data:[ -9223372036854775000, -1, 0, 1, 9223372036854775000 ] };
 tests[tests.length] = { code:"floatArrayParam", data:[ -100000000000000000000, -1, 0, 1, 100000000000000000000 ] };
-tests[tests.length] = { code:"doubleArrayParam", data:[ -100000000000000000000, -1, 0, 1, 100000000000000000000 ] };
+
+double1D = [ -100000000000000000000, -1, 0, 1, 100000000000000000000 ];
+tests[tests.length] = { code:"doubleArrayParam", data:double1D };
+double2D = [ double1D, double1D ];
+tests[tests.length] = { code:"double2DArrayParam", data:double2D };
+double3D = [ double2D, double2D ];
+tests[tests.length] = { code:"double3DArrayParam", data:double3D };
+double4D = [ double3D, double3D ];
+tests[tests.length] = { code:"double4DArrayParam", data:double4D };
+double5D = [ double4D, double4D ];
+tests[tests.length] = { code:"double5DArrayParam", data:double5D };
 
 // Unicode: we could be here for some time, so I just picked some commmon ones
 tests[tests.length] = { code:"charParam", data:"\u0080" };
@@ -359,8 +369,6 @@ function sendBatch(start, size, rate)
         for (var i = start; i < start + size && i < tests.length; i++)
         {
             test = tests[i];
-            //var num = i;
-            //var callback = function(data) { testResults(data, num); };
             callback = new Function("data", "testResults(data, " + i + ");");
             param = test.data;
 

@@ -247,6 +247,42 @@ public class Test
      * @param test
      * @return string
      */
+    public double[][] double2DArrayParam(double[][] test)
+    {
+        return test;
+    }
+
+    /**
+     * @param test
+     * @return string
+     */
+    public double[][][] double3DArrayParam(double[][][] test)
+    {
+        return test;
+    }
+
+    /**
+     * @param test
+     * @return string
+     */
+    public double[][][][] double4DArrayParam(double[][][][] test)
+    {
+        return test;
+    }
+
+    /**
+     * @param test
+     * @return string
+     */
+    public double[][][][][] double5DArrayParam(double[][][][][] test)
+    {
+        return test;
+    }
+
+    /**
+     * @param test
+     * @return string
+     */
     public BigInteger bigIntegerParam(BigInteger test)
     {
         return test;
