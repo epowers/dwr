@@ -61,21 +61,21 @@ public class ScriptedCreator extends AbstractCreator implements Creator
      * Are we caching the script (default: false)
      * @return Returns the reloadable variable
      */
-    public String getReloadable()
+    public String isCacheable()
     {
-        return String.valueOf(reloadable);
+        return String.valueOf(cacheable);
     }
 
     /**
-     * @param reloadable Whether or not to reload the script.  
+     * @param cacheable Whether or not to reload the script.  
      * The default is <b>true</b>. This parameter is only used if scriptPath is
      * used instead of script.  When reloadable is true, ScriptedCreator will
      * check to see if the script has been modified before returning the
      * existing created class.
      */
-    public void setReloadable(String reloadable)
+    public void setCacheable(String cacheable)
     {
-        this.reloadable = Boolean.valueOf(reloadable).booleanValue();
+        this.cacheable = Boolean.valueOf(cacheable).booleanValue();
     }
 
     /**
@@ -137,7 +137,7 @@ public class ScriptedCreator extends AbstractCreator implements Creator
             throw new InstantiationException(Messages.getString("ScriptedCreator.MissingScript")); //$NON-NLS-1$
         }
 
-        if (cachedScript != null && (!reloadable || !scriptUpdated()) )
+        if (cachedScript != null && (!cacheable || !scriptUpdated()) )
         {
             return cachedScript;
         }
@@ -215,7 +215,7 @@ public class ScriptedCreator extends AbstractCreator implements Creator
      */
     public Class getType()
     {
-        if (clazz == null || (reloadable && scriptUpdated()))
+        if (clazz == null || (!cacheable && scriptUpdated()))
         {
             try
             {
@@ -282,7 +282,7 @@ public class ScriptedCreator extends AbstractCreator implements Creator
      * Whether or not to reload the script.  Only used if scriptPath is used.
      * ie: An inline script is not reloadable
      */
-    private boolean reloadable = true;
+    private boolean cacheable = true;
 
     /**
      * Script modified time. Only used when scriptPath is used.
