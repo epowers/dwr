@@ -41,12 +41,18 @@
     <option>GET</option>
     <option selected="selected">POST</option>
   </select>
+  &nbsp;
+  Asynchronous:
+  <select id="async">
+    <option value="async" selected="selected">Asynchronous</option>
+    <option value="sync">Synchronous</option>
+  </select>
 </div>
 <div>
-  Rate:
+  Delay:
   <select id="rate">
-    <option value="0">0ms (No delay)</option>
-    <option value="5">5ms (Very Fast)</option>
+    <option value="0">0ms</option>
+    <option value="5">5ms</option>
     <option value="10">10ms</option>
     <option value="15" selected="selected">15ms</option>
     <option value="20">20ms</option>
@@ -54,12 +60,12 @@
     <option value="30">30ms</option>
     <option value="40">40ms</option>
     <option value="50">50ms</option>
-    <option value="100">100ms (Slow)</option>
+    <option value="100">100ms</option>
   </select>
   &nbsp;
   Batch size:
   <select id="size">
-    <option value="0" selected="selected">0 (None)</option>
+    <option value="0" selected="selected">None</option>
     <option value="1">1</option>
     <option value="2">2</option>
     <option value="3">3</option>
@@ -77,6 +83,17 @@
   <select id="ordered">
     <option>Yes</option>
     <option selected="selected">No</option>
+  </select>
+  &nbsp;
+  Timeout:
+  <select id="timeout">
+    <option value="0" selected="selected">None</option>
+    <option value="1000">1sec</option>
+    <option value="2000">2sec</option>
+    <option value="3000">3sec</option>
+    <option value="4000">4sec</option>
+    <option value="5000">5sec</option>
+    <option value="6000">6sec</option>
   </select>
 </div>
 

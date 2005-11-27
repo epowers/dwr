@@ -65,6 +65,26 @@ public class Test
     }
 
     /**
+     * @param wait
+     * @return wait
+     */
+    public int waitFor(int wait)
+    {
+        synchronized (Thread.currentThread())
+        {
+            try
+            {
+                Thread.currentThread().wait(wait);
+                return wait;
+            }
+            catch (InterruptedException ex)
+            {
+                return 0;
+            }
+        }
+    }
+
+    /**
      * 
      */
     public void doNothing()
