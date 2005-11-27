@@ -30,7 +30,6 @@ tests[tests.length] = { code:"shortParam", data:0 };
 tests[tests.length] = { code:"shortParam", data:1 };
 tests[tests.length] = { code:"shortParam", data:32767 };
 
-/*
 tests[tests.length] = { code:"intParam", data:-2147483648 };
 tests[tests.length] = { code:"intParam", data:-1 };
 tests[tests.length] = { code:"intParam", data:0 };
@@ -299,7 +298,6 @@ tests[tests.length] = { code:"stringStringHashMapParam", data:map1 };
 tests[tests.length] = { code:"stringStringHashMapParam", data:map2 };
 tests[tests.length] = { code:"stringStringTreeMapParam", data:map1 };
 tests[tests.length] = { code:"stringStringTreeMapParam", data:map2 };
-*/
 
 function startTest() {
   $("start").disabled = true;
@@ -316,9 +314,6 @@ function startTest() {
   }
   DWRUtil.setValue("totals", "");
 
-  starttime = new Date();
-  failcount = 0;
-
   // We were trying to get others to contribute test results
   //DWRUtil.showById("reply");
 
@@ -334,6 +329,9 @@ function startTest() {
 }
 
 function setSettings() {
+  starttime = new Date();
+  failcount = 0;
+
   // Set the method
   var method = DWRUtil.getValue("method");
   if (method == "iframe") {
@@ -399,7 +397,7 @@ function checkTidyUp(index) {
   if (index == tests.length) {
     $("start").disabled = false;
 
-    var mslen = new Date().getTime() - starttime.getTime();
+    var mslen = new Date().getTime() - window.starttime.getTime();
     var tps = Math.round((10000 * tests.length) / mslen) / 10;
     var totals = "Tests executed in " + (mslen / 1000) + " seconds at an average of " + tps + " tests per second.";
     DWRUtil.setValue("totals", totals);
