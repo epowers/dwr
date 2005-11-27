@@ -14,7 +14,6 @@ var batch = 1;
 tests[tests.length] = { code:"waitFor", data:1000 };
 tests[tests.length] = { code:"waitFor", data:2000 };
 tests[tests.length] = { code:"waitFor", data:3000 };
-tests[tests.length] = { code:"waitFor", data:30000 };
 
 tests[tests.length] = { code:"booleanParam", data:true };
 tests[tests.length] = { code:"booleanParam", data:false };
