@@ -1,33 +1,24 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
 <head>
-  <title>DWR - Unit Test</title>
+  <title>DWR - Marshalling Tests</title>
   <script type='text/javascript' src='./dwr/interface/Test.js'></script>
   <script type='text/javascript' src='./dwr/engine.js'></script>
   <script type='text/javascript' src='./dwr/util.js'></script>
-  <script type='text/javascript' src='testsuite.js'></script>
-  <style>
-  .showborder td, .showborder th
-  {
-      border: 1px solid #999999;
-      padding: 2px 5px 2px 5px;
-  }
-
-  .showborder
-  {
-      border-collapse: collapse;
-  }
-
-  #chart
-  {
-      font-size: 70%;
-  }
-  </style>
+  <script type='text/javascript' src='marshallingTest.js'></script>
+  <script type='text/javascript' src='generic.js'></script>
+  <link type="text/css" href="generic.css" rel="stylesheet" />
 </head>
 
 <body onload="init()">
+<div>
+[ <a href="index.html">Top Level</a>
+| <a href="dhtmlTest.html">DHTML Tests</a>
+| <a href="integrationTest.html">Integration Tests</a>
+| Marshalling Tests ]
+</div>
 
-<h2>Unit Test Page</h2>
+<h2>Unit Test Settings</h2>
 
 <div style="margin-bottom:5px">
   Style:
@@ -97,28 +88,41 @@
   </select>
 </div>
 
-<p>
-  Found <script>document.write(tests.length)</script> unit tests.<br/>
-  <input type="button" onclick="startTest();" id="start" value="Start"/>
-  <span id='totals'></span>
-</p>
+<h2>Marshalling Tests</h2>
 
-<p>
-  Tests Executed (<span id='execreport'>0</span>):
-</p>
-<div style="border: 1px solid black; width:90%;">
-  <div id="progress" style="width:0%; background:green;">&nbsp;</div>
-</div>
+<table class="showborder" id="testSummary">
+  <tr>
+    <th>Number of Tests:</th>
+    <td><script>document.write(tests.length)</script></td>
+  </tr>
+  <tr>
+    <th>Tests Dispatched:</th>
+    <td><span id="testsDispatched">0</span></td>
+  </tr>
+  <tr>
+    <th>Tests Returned:</th>
+    <td><span id='execreport'>0</span></td>
+  </tr>
+  <tr>
+    <th>Tests Failed:</th>
+    <td><span id='failreport'>0</span></td>
+  </tr>
+  <tr>
+    <th>Errors:</th>
+    <td><div id="failures"></div></td>
+  </tr>
+  <tr>
+    <th>Tests per second:</th>
+    <td><span id='timePerTest'></span></td>
+  </tr>
+  <tr>
+    <th>Action:</th>
+    <td><input type="button" onclick="startTest();" id="start" value="Start"/></td>
+  </tr>
+</table>
 
-<p>
-  Failures (<span id='failreport'>0</span>):
-</p>
-<div id="failures" style="border: 1px solid red; max-height:200px; overflow:auto; width:90%;">
-  None:
-</div>
+<p></p>
 
-<div id="table">
-  <h2 style="margin-top:40px;">Results</h2>
   <table class="showborder">
     <thead>
       <tr>
@@ -132,42 +136,6 @@
     <tbody id="chart">
     </tbody>
   </table>
-</div>
-
-<div id="reply" style="display:none;">
-  <h2 style="margin-top:40px;">More Information</h2>
-  <p>
-    Please wait until the tests have finished, and then tell us if they worked
-    so we can make DWR better.
-  </p>
-  <p>
-    If you got any error dialogs, please tell us roughly what they said:
-    <br/>
-    <textarea id="moreinfo" style="width:100%; margin-top:10px; margin-bottom:10px;" rows="5">
-    </textarea>
-    <br/>
-    If your browser is spoofing its identity, please tell us what it really is.
-    Full user agent not required, something like "Opera/4" or "IE/5" is fine. 
-    <br/>
-    <input type="hidden" id="useragent-reported"/>
-    <input type="text" id="useragent-real" style="width:100%; margin-top:10px; margin-bottom:10px;"/>
-    <br/>
-    <input type="button" onclick="report();" value="File report / Get results"/>
-  </p>
-</div>
-
-<div id="results" style="display:none;">
-  <table class="showborder">
-    <thead>
-      <tr>
-        <th>Browser</th>
-        <th>Results</th>
-      </tr>
-    </thead>
-    <tbody id="resultsTable">
-    </tbody>
-  </table>
-</div>
 
 </body>
 </html>
