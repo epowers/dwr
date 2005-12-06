@@ -15,7 +15,6 @@
  */
 package uk.ltd.getahead.dwr.convert;
 
-import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,9 +33,9 @@ import uk.ltd.getahead.dwr.InboundVariable;
 import uk.ltd.getahead.dwr.Messages;
 import uk.ltd.getahead.dwr.OutboundContext;
 import uk.ltd.getahead.dwr.OutboundVariable;
+import uk.ltd.getahead.dwr.TypeHintContext;
 import uk.ltd.getahead.dwr.compat.BaseV10Converter;
 import uk.ltd.getahead.dwr.util.LocalUtil;
-import uk.ltd.getahead.dwr.util.Logger;
 
 /**
  * An implementation of Converter for Collections of Strings.
@@ -80,19 +79,10 @@ public class CollectionConverter extends BaseV10Converter implements Converter
 
         try
         {
-            Method method = inctx.getCurrentMethod();
-            int paramNum = inctx.getCurrentParameterNum();
+            TypeHintContext icc = inctx.getCurrentTypeHintContext();
 
-            Class subtype = config.getExtraTypeInfo(method, paramNum, 0);
-            if (subtype == null)
-            {
-                log.warn("Missing type info for " + method.getName() + "(), param=" + paramNum + ". Assuming this is a collection of Strings. Please add to <signatures> in dwr.xml"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                subtype = String.class;
-            }
-            else
-            {
-                log.debug("Using extra type info for " + method.getName() + "(), param=" + paramNum + " of " + subtype); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-            }
+            TypeHintContext subthc = icc.createChildContext(0);
+            Class subtype = config.getExtraTypeInfo(subthc);
 
             Collection col = null;
 
@@ -144,7 +134,7 @@ public class CollectionConverter extends BaseV10Converter implements Converter
                 String[] split = LocalUtil.splitInbound(token);
                 InboundVariable nested = new InboundVariable(iv.getLookup(), split[LocalUtil.INBOUND_INDEX_TYPE], split[LocalUtil.INBOUND_INDEX_VALUE]);
 
-                Object output = config.convertInbound(subtype, nested, inctx);
+                Object output = config.convertInbound(subtype, nested, inctx, subthc);
                 col.add(output);
             }
 
@@ -213,9 +203,4 @@ public class CollectionConverter extends BaseV10Converter implements Converter
      * For nested conversions
      */
     private ConverterManager config = null;
-
-    /**
-     * The log stream
-     */
-    private static final Logger log = Logger.getLogger(CollectionConverter.class);
 }

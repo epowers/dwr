@@ -38,6 +38,7 @@ import uk.ltd.getahead.dwr.Configuration;
 import uk.ltd.getahead.dwr.ConverterManager;
 import uk.ltd.getahead.dwr.Creator;
 import uk.ltd.getahead.dwr.CreatorManager;
+import uk.ltd.getahead.dwr.TypeHintContext;
 import uk.ltd.getahead.dwr.util.LogErrorHandler;
 import uk.ltd.getahead.dwr.util.Logger;
 
@@ -399,7 +400,8 @@ public class DefaultConfiguration implements Configuration
             {
                 String type = st.nextToken();
                 Class clazz = Class.forName(type.trim());
-                converterManager.setExtraTypeInfo(method, paramNo, j++, clazz);
+                TypeHintContext thc = new TypeHintContext(method, paramNo).createChildContext(j++);
+                converterManager.setExtraTypeInfo(thc, clazz);
             }
         }
     }

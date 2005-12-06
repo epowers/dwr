@@ -39,6 +39,7 @@ import uk.ltd.getahead.dwr.ConverterManager;
 import uk.ltd.getahead.dwr.Creator;
 import uk.ltd.getahead.dwr.CreatorManager;
 import uk.ltd.getahead.dwr.InboundContext;
+import uk.ltd.getahead.dwr.TypeHintContext;
 import uk.ltd.getahead.dwr.InboundVariable;
 import uk.ltd.getahead.dwr.Messages;
 import uk.ltd.getahead.dwr.OutboundContext;
@@ -125,21 +126,18 @@ public class ExecuteQuery
                 Object[] params = new Object[method.getParameterTypes().length];
                 for (int j = 0; j < method.getParameterTypes().length; j++)
                 {
-                    Class paramType = method.getParameterTypes()[j];
-
-                    InboundVariable param = inctx.getParameter(callNum, j);
-                    inctx.pushContext(method, j);
-
                     try
                     {
-                        params[j] = converterManager.convertInbound(paramType, param, inctx);
+                        Class paramType = method.getParameterTypes()[j];
+                        InboundVariable param = inctx.getParameter(callNum, j);
+                        TypeHintContext incc = new TypeHintContext(method, j);
+
+                        params[j] = converterManager.convertInbound(paramType, param, inctx, incc);
                     }
                     catch (ConversionException ex)
                     {
                         throw new ConversionException(Messages.getString("ExecuteQuery.ConversionError", call.getScriptName(), call.getMethodName(), ex.getMessage())); //$NON-NLS-1$
                     }
-
-                    inctx.popContext(method, j);
                 }
 
                 // Get ourselves an object to execute a method on unless the

@@ -15,7 +15,6 @@
  */
 package uk.ltd.getahead.dwr.impl;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -133,8 +132,9 @@ public class DefaultExecProcessor implements Processor
                 log.debug("- Request URL:" + req.getRequestURL()); //$NON-NLS-1$
                 log.debug("- Query:      " + req.getQueryString()); //$NON-NLS-1$
                 log.debug("- Method:     " + req.getMethod()); //$NON-NLS-1$
-                log.debug("- Body: {"); //$NON-NLS-1$
 
+                /* This is borken whenever we use POST, so it's probably not worth it
+                log.debug("- Body: {"); //$NON-NLS-1$
                 int lines = 0;
                 BufferedReader in = req.getReader();
                 while (in != null && lines < 100)
@@ -148,8 +148,8 @@ public class DefaultExecProcessor implements Processor
                     log.debug("-   " + line); //$NON-NLS-1$
                     lines++;
                 }
-
                 log.debug("- }" + req.getMethod()); //$NON-NLS-1$
+                */
             }
 
             resp.setContentType(HtmlConstants.MIME_HTML);

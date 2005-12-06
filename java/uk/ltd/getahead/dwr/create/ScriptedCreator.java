@@ -20,10 +20,12 @@ import java.io.RandomAccessFile;
 
 import javax.servlet.ServletContext;
 
+import org.apache.bsf.BSFException;
 import org.apache.bsf.BSFManager;
 
 import uk.ltd.getahead.dwr.Creator;
 import uk.ltd.getahead.dwr.Messages;
+import uk.ltd.getahead.dwr.WebContext;
 import uk.ltd.getahead.dwr.WebContextFactory;
 import uk.ltd.getahead.dwr.util.Logger;
 
@@ -61,21 +63,21 @@ public class ScriptedCreator extends AbstractCreator implements Creator
      * Are we caching the script (default: false)
      * @return Returns the reloadable variable
      */
-    public String isCacheable()
+    public String isReloadable()
     {
-        return String.valueOf(cacheable);
+        return String.valueOf(reloadable);
     }
 
     /**
-     * @param cacheable Whether or not to reload the script.  
+     * @param reloadable Whether or not to reload the script.  
      * The default is <b>true</b>. This parameter is only used if scriptPath is
      * used instead of script.  When reloadable is true, ScriptedCreator will
      * check to see if the script has been modified before returning the
      * existing created class.
      */
-    public void setCacheable(String cacheable)
+    public void setReloadable(String reloadable)
     {
-        this.cacheable = Boolean.valueOf(cacheable).booleanValue();
+        this.reloadable = Boolean.valueOf(reloadable).booleanValue();
     }
 
     /**
@@ -137,7 +139,7 @@ public class ScriptedCreator extends AbstractCreator implements Creator
             throw new InstantiationException(Messages.getString("ScriptedCreator.MissingScript")); //$NON-NLS-1$
         }
 
-        if (cachedScript != null && (!cacheable || !scriptUpdated()) )
+        if (cachedScript != null && (reloadable || !scriptUpdated()) )
         {
             return cachedScript;
         }
@@ -215,7 +217,7 @@ public class ScriptedCreator extends AbstractCreator implements Creator
      */
     public Class getType()
     {
-        if (clazz == null || (!cacheable && scriptUpdated()))
+        if (clazz == null || (reloadable && scriptUpdated()))
         {
             try
             {
@@ -244,6 +246,17 @@ public class ScriptedCreator extends AbstractCreator implements Creator
             }
 
             BSFManager bsfman = new BSFManager();
+
+            try
+            {
+                WebContext context = WebContextFactory.get();
+                bsfman.declareBean("context", context, context.getClass()); //$NON-NLS-1$
+            }
+            catch (BSFException ex)
+            {
+                log.warn("Failed to register WebContext with scripting engine: " + ex.getMessage()); //$NON-NLS-1$
+            }
+
             return bsfman.eval(language, (null == scriptPath ? "dwr.xml" : scriptPath), 0, 0, getScript()); //$NON-NLS-1$
         }
         catch (Exception ex)
@@ -282,7 +295,7 @@ public class ScriptedCreator extends AbstractCreator implements Creator
      * Whether or not to reload the script.  Only used if scriptPath is used.
      * ie: An inline script is not reloadable
      */
-    private boolean cacheable = true;
+    private boolean reloadable = true;
 
     /**
      * Script modified time. Only used when scriptPath is used.

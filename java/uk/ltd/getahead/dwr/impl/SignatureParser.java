@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 import uk.ltd.getahead.dwr.ConverterManager;
+import uk.ltd.getahead.dwr.TypeHintContext;
 import uk.ltd.getahead.dwr.util.Logger;
 import uk.ltd.getahead.dwr.util.JavascriptUtil;
 
@@ -51,6 +52,8 @@ public class SignatureParser
     {
         try
         {
+            log.debug("Parsing extra type info: "); //$NON-NLS-1$
+
             String reply = sourceUtil.stripMultiLineComments(sigtext);
             reply = sourceUtil.stripSingleLineComments(reply);
             String process = reply;
@@ -175,12 +178,13 @@ public class SignatureParser
 
                 if (clazz != null)
                 {
+                    TypeHintContext thc = new TypeHintContext(method, i).createChildContext(j);
+                    converterManager.setExtraTypeInfo(thc, clazz);
+
                     if (log.isDebugEnabled())
                     {
-                        log.debug("Extra type info: " + method.getName() + "(), param[" + i + "<" + j + ">] is " + clazz.getName()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+                        log.debug("- " + thc + " = " + clazz.getName()); //$NON-NLS-1$ //$NON-NLS-2$
                     }
-
-                    converterManager.setExtraTypeInfo(method, i, j, clazz);
                 }
                 else
                 {
