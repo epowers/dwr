@@ -42,11 +42,7 @@ public final class InboundContext
      */
     public void popContext()
     {
-        /*TypeHintContext ctx = (TypeHintContext)*/ contexts.removeFirst();
-        //if (ctx.getGenericParameterTree().size() == 0)
-        //{
-        //    throw new IllegalArgumentException("Non-matching genericParam"); //$NON-NLS-1$
-        //}
+        contexts.removeFirst();
     }
 
     /**
