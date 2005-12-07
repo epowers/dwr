@@ -143,9 +143,11 @@ public class ExecuteQuery
                 // Get ourselves an object to execute a method on unless the
                 // method is static
                 Object object = null;
+                String scope = creator.getScope();
+                boolean create = false;
+
                 if (!Modifier.isStatic(method.getModifiers()))
                 {
-                    String scope = creator.getScope();
                     WebContext webcx = WebContextFactory.get();
 
                     // Check the various scopes to see if it is there
@@ -166,13 +168,8 @@ public class ExecuteQuery
                     // If we don't have an object the call the creator
                     if (object == null)
                     {
-                        // Create an instance
-                        log.debug("Create Object: script=" + call.getScriptName() + ", scope=" + scope + ", creator=" + creator.getClass().getName()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                        create = true;
                         object = creator.getInstance();
-                    }
-                    else
-                    {
-                        log.debug("Fetched Object: script=" + call.getScriptName() + ", scope=" + scope + ", creator=" + creator.getClass().getName()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                     }
 
                     // We might need to remember it for next time
@@ -191,8 +188,48 @@ public class ExecuteQuery
                     // Creator.PAGE scope means we create one every time anyway
                 }
 
+                // Some debug
+                log.info("Exec[" + callNum + "]: " + call.getScriptName() + "." + call.getMethodName() + "()"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+                if (log.isDebugEnabled())
+                {
+                    StringBuffer buffer = new StringBuffer();
+
+                    if (create)
+                    {
+                        buffer.append("--Object created, "); //$NON-NLS-1$
+                        if (!scope.equals(Creator.PAGE))
+                        {
+                            buffer.append(" stored in "); //$NON-NLS-1$
+                            buffer.append(scope);
+                        }
+                        else
+                        {
+                            buffer.append(" no stored"); //$NON-NLS-1$
+                        }
+                    }
+                    else
+                    {
+                        buffer.append("--Object found in "); //$NON-NLS-1$
+                        buffer.append(scope);
+                    }
+
+                    buffer.append(". Call params ("); //$NON-NLS-1$
+                    for (int j = 0; j < inctx.getParameterCount(callNum); j++)
+                    {
+                        if (j != 0)
+                        {
+                            buffer.append(", "); //$NON-NLS-1$
+                        }
+                        InboundVariable param = inctx.getParameter(callNum, j);
+                        buffer.append(param.toString());
+                    }
+                    buffer.append(") id="); //$NON-NLS-1$
+                    buffer.append(call.getId());
+
+                    log.debug(buffer.toString());
+                }
+
                 // Execute
-                log.info("Executing: " + method.toString()); //$NON-NLS-1$
                 Object reply = method.invoke(object, params);
 
                 OutboundVariable ov = converterManager.convertOutbound(reply, converted);
@@ -254,18 +291,17 @@ public class ExecuteQuery
             // parameters have got dumped on one line.
             if (line.indexOf('&') == -1)
             {
-                log.debug("POST line: " + line); //$NON-NLS-1$
                 parsePostLine(line, paramMap);
             }
             else
             {
+                log.debug("Using iframe POST mode"); //$NON-NLS-1$
                 StringTokenizer st = new StringTokenizer(line, "&"); //$NON-NLS-1$
                 while (st.hasMoreTokens())
                 {
                     String part = st.nextToken();
                     part = LocalUtil.decode(part);
 
-                    log.debug("iframe POST line: " + part); //$NON-NLS-1$
                     parsePostLine(part, paramMap);
                 }
             }
@@ -321,11 +357,6 @@ public class ExecuteQuery
 
             if (array.length == 1)
             {
-                if (log.isDebugEnabled())
-                {
-                    log.debug("GET line: " + key + '=' + array[0]); //$NON-NLS-1$
-                }
-
                 convertedMap.put(key, array[0]);
             }
             else
@@ -388,34 +419,6 @@ public class ExecuteQuery
         if (paramMap.size() != 0)
         {
             log.warn("Entries left over in parameter map"); //$NON-NLS-1$
-        }
-
-        if (log.isDebugEnabled())
-        {
-            for (int callNum = 0; callNum < calls.getCallCount(); callNum++)
-            {
-                Call call = calls.getCall(callNum);
-
-                log.debug("Call[" + callNum + "]: " + call.getScriptName() + '.' + call.getMethodName() + "();"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-
-                for (int i = 0; i < call.getInboundContext().getParameterCount(); i++)
-                {
-                    log.debug("  Param: " + i + '=' + call.getInboundContext().getParameter(callNum, i)); //$NON-NLS-1$
-                }
-            }
-
-            // We can just use 0 because they are all shared
-            if (calls.getCallCount() > 0)
-            {
-                InboundContext inctx = calls.getCall(0).getInboundContext();
-                for (Iterator it = inctx.getInboundVariableNames(); it.hasNext();)
-                {
-                    String key = (String) it.next();
-                    InboundVariable value = inctx.getInboundVariable(key);
-
-                    log.debug("  Env: " + key + '=' + value.toString()); //$NON-NLS-1$
-                }
-            }
         }
 
         return calls;
@@ -497,8 +500,7 @@ public class ExecuteQuery
     {
         try
         {
-            boolean convertable = converterManager.isConvertable(th.getClass());
-            if (convertable)
+            if (converterManager.isConvertable(th.getClass()))
             {
                 return converterManager.convertOutbound(th, converted);
             }
