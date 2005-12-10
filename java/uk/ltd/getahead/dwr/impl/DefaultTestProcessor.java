@@ -242,7 +242,7 @@ public class DefaultTestProcessor implements Processor
             }
             if (overloaded)
             {
-                out.println("<br/><span class='warning'>(Warning: overloaded methods are not recommended. See <a href='#overloadedMethod'>below</a>)</span>"); //$NON-NLS-1$
+                out.println("<br/><span class='warning'>(Warning: overloaded methods are not recommended. See <a href='#overloadedMethod'>below</a> for more including notes on false positives)</span>"); //$NON-NLS-1$
             }
 
             // Print a warning if the method uses un-marshallable types
