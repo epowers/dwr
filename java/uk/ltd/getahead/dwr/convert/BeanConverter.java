@@ -314,7 +314,6 @@ public class BeanConverter extends BaseV10Converter implements Converter
                     buffer.append(nested.getAssignCode());
                     buffer.append(';');
 
-                    // TODO: Does this hack want to stay?
                     // In an attempt to work around a FF1.4 bug we split long lines
                     if (i % 10 == 0)
                     {

@@ -158,7 +158,6 @@ public class DefaultConverterManager implements ConverterManager
                 return null;
             }
 
-            // TODO: push the puch/pop inside the converters?
             inctx.pushContext(incc);
             converted = converter.convertInbound(paramType, iv, inctx);
             inctx.popContext();

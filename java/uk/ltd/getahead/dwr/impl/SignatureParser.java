@@ -306,9 +306,6 @@ public class SignatureParser
         int lastSpace = classMethodChop.lastIndexOf(' ');
         if (lastSpace >= 0)
         {
-            // TODO: Remove this comment and the 2 commented out lines 12 down
-            // when we are sure this alg works just as well.
-            //classMethodChop = classMethodChop.substring(lastSpace, classMethodChop.length() - 1);
             classMethodChop = classMethodChop.substring(lastSpace);
         }
 
@@ -320,8 +317,6 @@ public class SignatureParser
             return null;
         }
 
-        //String className = classMethodChop.substring(0, lastDot);
-        //String methodName = classMethodChop.substring(lastDot + 1);
         String className = classMethodChop.substring(0, lastDot).trim();
         String methodName = classMethodChop.substring(lastDot + 1).trim();
 
