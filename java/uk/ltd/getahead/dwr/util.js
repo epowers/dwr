@@ -697,23 +697,24 @@ DWRUtil.addRows = function(ele, data, cellFuncs, options) {
   if (!options) options = {};
   if (!options.rowCreator) options.rowCreator = DWRUtil._defaultRowCreator;
   if (!options.cellCreator) options.cellCreator = DWRUtil._defaultCellCreator;
-  // TODO: remove the frag if it does not cause bugs: var frag = document.createDocumentFragment();
+  // TODO: remove the frag if it does not cause bugs:
+  var frag = document.createDocumentFragment();
   var tr, i;
   if (DWRUtil._isArray(data)) {
     for (i = 0; i < data.length; i++) {
       tr = DWRUtil._addRowInner(data[i], cellFuncs, options);
-      if (tr != null) ele.appendChild(tr);
+      if (tr != null) frag.appendChild(tr);
     }
   }
   else if (typeof data == "object") {
     i = 0;
     for (var row in data) {
       tr = DWRUtil._addRowInner(row, cellFuncs, options, i);
-      if (tr != null) ele.appendChild(tr);
+      if (tr != null) frag.appendChild(tr);
       i++;
     }
   }
-  //ele.appendChild(frag);
+  ele.appendChild(frag);
 };
 
 /**

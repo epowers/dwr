@@ -204,7 +204,7 @@ public class ExecuteQuery
                         }
                         else
                         {
-                            buffer.append(" no stored"); //$NON-NLS-1$
+                            buffer.append(" not stored"); //$NON-NLS-1$
                         }
                     }
                     else
@@ -304,6 +304,23 @@ public class ExecuteQuery
 
                     parsePostLine(part, paramMap);
                 }
+            }
+        }
+
+        // Safari gets confused so we need some special treatment
+        // See: http://bugzilla.opendarwin.org/show_bug.cgi?id=3565
+        //      https://dwr.dev.java.net/issues/show_bug.cgi?id=93
+        //      http://jira.atlassian.com/browse/JRA-8354
+        //      http://developer.apple.com/internet/safari/uamatrix.html
+        String params = req.getParameter("isBrokenSafari2"); //$NON-NLS-1$
+        if (params != null && params.length() > 0)
+        {
+            StringTokenizer st = new StringTokenizer(params, "\n"); //$NON-NLS-1$
+            while (st.hasMoreTokens())
+            {
+                String part = st.nextToken();
+                part = LocalUtil.decode(part);
+                parsePostLine(part, paramMap);
             }
         }
 
