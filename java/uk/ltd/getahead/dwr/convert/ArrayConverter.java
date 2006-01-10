@@ -77,7 +77,7 @@ public class ArrayConverter extends BaseV10Converter implements Converter
 
             // We should put the new object into the working map in case it
             // is referenced later nested down in the conversion process.
-            inctx.addConverted(iv, array);
+            inctx.addConverted(iv, paramType, array);
             InboundContext incx = iv.getLookup();
 
             for (int i = 0; i < size; i++)
