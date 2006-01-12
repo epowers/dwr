@@ -132,6 +132,11 @@ public final class InboundVariable
             return false;
         }
 
+        if (this.key == null || that.key == null)
+        {
+            return false;
+        }
+
         if (!this.key.equals(that.key))
         {
             return false;

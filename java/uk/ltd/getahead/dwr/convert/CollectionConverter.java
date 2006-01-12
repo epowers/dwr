@@ -132,7 +132,7 @@ public class CollectionConverter extends BaseV10Converter implements Converter
                 String token = st.nextToken();
 
                 String[] split = LocalUtil.splitInbound(token);
-                InboundVariable nested = new InboundVariable(iv.getLookup(), split[LocalUtil.INBOUND_INDEX_TYPE], split[LocalUtil.INBOUND_INDEX_VALUE]);
+                InboundVariable nested = new InboundVariable(iv.getLookup(), null, split[LocalUtil.INBOUND_INDEX_TYPE], split[LocalUtil.INBOUND_INDEX_VALUE]);
 
                 Object output = config.convertInbound(subtype, nested, inctx, subthc);
                 col.add(output);

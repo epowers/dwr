@@ -239,7 +239,7 @@ public class BeanConverter extends BaseV10Converter implements Converter
                     Class propType = descriptor.getPropertyType();
 
                     String[] split = LocalUtil.splitInbound(val);
-                    InboundVariable nested = new InboundVariable(iv.getLookup(), split[LocalUtil.INBOUND_INDEX_TYPE], split[LocalUtil.INBOUND_INDEX_VALUE]);
+                    InboundVariable nested = new InboundVariable(iv.getLookup(), null, split[LocalUtil.INBOUND_INDEX_TYPE], split[LocalUtil.INBOUND_INDEX_VALUE]);
 
                     TypeHintContext incc = new TypeHintContext(setter, 0);
                     Object output = config.convertInbound(propType, nested, inctx, incc);

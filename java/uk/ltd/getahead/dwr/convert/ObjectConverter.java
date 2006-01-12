@@ -245,7 +245,7 @@ public class ObjectConverter extends BaseV10Converter implements Converter
                     Class propType = field.getType();
 
                     String[] split = LocalUtil.splitInbound(val);
-                    InboundVariable nested = new InboundVariable(iv.getLookup(), split[LocalUtil.INBOUND_INDEX_TYPE], split[LocalUtil.INBOUND_INDEX_VALUE]);
+                    InboundVariable nested = new InboundVariable(iv.getLookup(), null, split[LocalUtil.INBOUND_INDEX_TYPE], split[LocalUtil.INBOUND_INDEX_VALUE]);
 
                     if (!field.isAccessible())
                     {
