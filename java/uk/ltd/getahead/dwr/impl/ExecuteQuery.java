@@ -389,8 +389,9 @@ public class ExecuteQuery
      * Fish out the important parameters
      * @param paramMap The string/string map to convert
      * @return The call details the methods we are calling
+     * @throws IOException If the parsing of input parameter fails
      */
-    private Calls parseParameters(Map paramMap)
+    private Calls parseParameters(Map paramMap) throws IOException
     {
         Calls calls = new Calls();
 
@@ -399,7 +400,15 @@ public class ExecuteQuery
 
         // Work out how many calls are in this packet
         String callStr = (String) paramMap.remove(ConversionConstants.INBOUND_CALL_COUNT);
-        int callCount = Integer.parseInt(callStr);
+        int callCount;
+        try
+        {
+            callCount = Integer.parseInt(callStr);
+        }
+        catch (NumberFormatException ex)
+        {
+            throw new IOException(Messages.getString("ExecuteQuery.BadCallCount", callStr)); //$NON-NLS-1$
+        }
 
         // Extract the ids, scriptnames and methodnames
         for (int callNum = 0; callNum < callCount; callNum++)

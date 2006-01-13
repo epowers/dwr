@@ -719,8 +719,8 @@ DWRUtil.addRows = function(ele, data, cellFuncs, options) {
 /**
  * @private Internal function to draw a single row of a table.
  */
-DWRUtil._addRowInner = function(row, cellFuncs, options, i) {
-  var tr = options.rowCreator(row, i);
+DWRUtil._addRowInner = function(rowData, cellFuncs, options, rowNum) {
+  var tr = options.rowCreator(rowData, rowNum);
   if (tr == null) return null;
   for (var j = 0; j < cellFuncs.length; j++) {
     var func = cellFuncs[j];
@@ -730,7 +730,7 @@ DWRUtil._addRowInner = function(row, cellFuncs, options, i) {
       td.appendChild(document.createTextNode(func));
     }
     else {
-      var reply = func(row);
+      var reply = func(rowData);
       td = options.cellCreator(reply, j);
       if (DWRUtil._isHTMLElement(reply, "td")) td = reply;
       else if (DWRUtil._isHTMLElement(reply)) td.appendChild(reply);
@@ -744,7 +744,7 @@ DWRUtil._addRowInner = function(row, cellFuncs, options, i) {
 /**
  * @private Default row creation function
  */
-DWRUtil._defaultRowCreator = function(row, i) {
+DWRUtil._defaultRowCreator = function(rowData, rowNum) {
   return document.createElement("tr");
 };
 

@@ -84,8 +84,10 @@ public class ArrayConverter extends BaseV10Converter implements Converter
             {
                 String token = st.nextToken();
                 String[] split = LocalUtil.splitInbound(token);
+                String splitType = split[LocalUtil.INBOUND_INDEX_TYPE];
+                String splitValue = split[LocalUtil.INBOUND_INDEX_VALUE];
 
-                InboundVariable nested = new InboundVariable(incx, null, split[LocalUtil.INBOUND_INDEX_TYPE], split[LocalUtil.INBOUND_INDEX_VALUE]);
+                InboundVariable nested = new InboundVariable(incx, null, splitType, splitValue);
                 Object output = converterManager.convertInbound(componentType, nested, inctx, inctx.getCurrentTypeHintContext());
                 Array.set(array, i, output);
             }

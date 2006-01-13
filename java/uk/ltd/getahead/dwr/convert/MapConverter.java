@@ -130,7 +130,9 @@ public class MapConverter extends BaseV10Converter implements Converter
                 // type and value (as passed in by Javascript)
                 String valStr = token.substring(colonpos + 1).trim();
                 String[] splitIv = LocalUtil.splitInbound(valStr);
-                InboundVariable valIv = new InboundVariable(incx, null, splitIv[LocalUtil.INBOUND_INDEX_TYPE], splitIv[LocalUtil.INBOUND_INDEX_VALUE]);
+                String splitIvValue = splitIv[LocalUtil.INBOUND_INDEX_VALUE];
+                String splitIvType = splitIv[LocalUtil.INBOUND_INDEX_TYPE];
+                InboundVariable valIv = new InboundVariable(incx, null, splitIvType, splitIvValue);
                 Object val = config.convertInbound(valType, valIv, inctx, valThc);
 
                 // Keys (unlike values) do not have type info passed with them

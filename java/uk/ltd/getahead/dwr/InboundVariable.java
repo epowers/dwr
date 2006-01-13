@@ -34,7 +34,7 @@ public final class InboundVariable
     {
         this.context = context;
 
-        if (ConversionConstants.TYPE_REFERENCE.equals(type)) 
+        if (ConversionConstants.TYPE_REFERENCE.equals(type))
         {
             String tempType = type;
             String tempValue = value;
@@ -54,10 +54,20 @@ public final class InboundVariable
 
             this.type = tempType;
             this.value = tempValue;
-            this.key = key;
-        } 
-        else 
-        {            
+
+            // For references without an explicit variable name, we use the
+            // name of the thing they point at
+            if (key == null)
+            {
+                this.key = value;
+            }
+            else
+            {
+                this.key = key;
+            }
+        }
+        else
+        {
             this.type = type;
             this.value = value;
             this.key = key;
