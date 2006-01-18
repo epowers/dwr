@@ -92,6 +92,16 @@ public class Test
     }
 
     /**
+     * @param a 
+     * @param b 
+     * @return are they equal
+     */
+    public boolean areIdentical(List a, List b)
+    {
+        return a == b;
+    }
+
+    /**
      * @return obja
      */
     public ObjA getLooped()
