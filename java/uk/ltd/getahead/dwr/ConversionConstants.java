@@ -22,6 +22,11 @@ package uk.ltd.getahead.dwr;
 public class ConversionConstants
 {
     /**
+     * Is this an instance of a broken copy of safari v2
+     */
+    public static final String BROKEN_SAFARI2 = "isBrokenSafari2"; //$NON-NLS-1$
+
+    /**
      * The name for reference types from javascript
      */
     public static final String TYPE_REFERENCE = "reference"; //$NON-NLS-1$
@@ -66,6 +71,11 @@ public class ConversionConstants
      * What prefix do we put to the input paramters
      */
     public static final String INBOUND_KEY_PARAM = "param"; //$NON-NLS-1$
+
+    /**
+     * What prefix do we put to the environment paramters
+     */
+    public static final String INBOUND_KEY_ENV = "e"; //$NON-NLS-1$
 
     /**
      * The character to use to distinguish between the variable name and the

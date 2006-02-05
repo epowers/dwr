@@ -226,6 +226,12 @@ public class ExecuteQuery
                     buffer.append(") id="); //$NON-NLS-1$
                     buffer.append(call.getId());
 
+                    buffer.append(". Using ("); //$NON-NLS-1$
+                    buffer.append(calls.isXhrMode() ? "XHR" : "IFrame"); //$NON-NLS-1$ //$NON-NLS-2$
+                    buffer.append(","); //$NON-NLS-1$
+                    buffer.append(req.getMethod());
+                    buffer.append(")"); //$NON-NLS-1$
+
                     log.debug(buffer.toString());
                 }
 
@@ -312,7 +318,7 @@ public class ExecuteQuery
         //      https://dwr.dev.java.net/issues/show_bug.cgi?id=93
         //      http://jira.atlassian.com/browse/JRA-8354
         //      http://developer.apple.com/internet/safari/uamatrix.html
-        String params = req.getParameter("isBrokenSafari2"); //$NON-NLS-1$
+        String params = req.getParameter(ConversionConstants.BROKEN_SAFARI2);
         if (params != null && params.length() > 0)
         {
             StringTokenizer st = new StringTokenizer(params, "\n"); //$NON-NLS-1$
@@ -444,7 +450,11 @@ public class ExecuteQuery
 
         if (paramMap.size() != 0)
         {
-            log.warn("Entries left over in parameter map"); //$NON-NLS-1$
+            paramMap.remove(ConversionConstants.BROKEN_SAFARI2);
+            if (paramMap.size() != 0)
+            {
+                log.warn("Entries left over in parameter map"); //$NON-NLS-1$
+            }
         }
 
         return calls;
