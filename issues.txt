@@ -13,10 +13,17 @@ safari bug
 	xml=true
 	isBrokenSafari2=true'
 
-iframe when activex is off
-	auto-fallback from xhr to iframe
+	Remember that currently we can remove: batch.map.isBrokenSafari2 = "true";
+	from engine.js
 
-call level metadata isn't merged into batch properly
+Breaking changes:
+	DWRUtil.getValue uses innerText in place of innerHTML for divs for consistency
+		Actually is this a good thing?
+	Changes to Converter API
+
+Removal of string in place of function option in DWRUtil.addRows
+
+-- Low Priority ----------------------------------------------------------------
 
 url re-writing not supported
 	I ended up having to extract DWREngine._sendData into a jsp and changing the
@@ -24,10 +31,11 @@ url re-writing not supported
 		batch.req.open("POST", batch.path + "/exec/" + statsInfo + "<html:rewrite href=''/>", true);
 	so that the <html:rewrite would add the jsessionid
 
-Breaking changes:
-	DWRUtil.getValue uses innerText in place of innerHTML for divs for consistency
+-- Ignore ----------------------------------------------------------------------
 
-
+iframe when activex is off
+	auto-fallback from xhr to iframe
+		DWR works fine unless security is really crazy
 
 problems with oc4j??
 	This is a berif description and I will send you my code soon.
@@ -43,3 +51,12 @@ problems with oc4j??
 IFrame GET is broken with Safari
 	iframe is only really useful with IE6 (with activex turned off) so we can
 	ignore this breakage
+
+everything.js
+	A script that gets all the bits in one lump
+	Do we need a dojo.require thing?
+
+-- Fixed -----------------------------------------------------------------------
+
+call level metadata isn't merged into batch properly
+
