@@ -59,7 +59,7 @@ public class DefaultIndexProcessor implements Processor
         {
             String name = (String) it.next();
             Creator creator = creatorManager.getCreator(name);
-            out.println("<li><a href='." + HtmlConstants.PATH_TEST + name + "'>" + name + "</a> (" + creator.getType().getName() + ")</li>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+            out.println("<li><a href='" + req.getContextPath() + req.getServletPath() + HtmlConstants.PATH_TEST + name + "'>" + name + "</a> (" + creator.getType().getName() + ")</li>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
         }
         out.println("</ul>"); //$NON-NLS-1$
 
