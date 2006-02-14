@@ -60,19 +60,19 @@ public class FacesExtensionFilter implements Filter
             FacesContextFactory contextFactory = (FacesContextFactory) FactoryFinder.getFactory(FactoryFinder.FACES_CONTEXT_FACTORY);
             LifecycleFactory lifecycleFactory = (LifecycleFactory) FactoryFinder.getFactory(FactoryFinder.LIFECYCLE_FACTORY);
             Lifecycle lifecycle = lifecycleFactory.getLifecycle(LifecycleFactory.DEFAULT_LIFECYCLE);
-    
-            // Either set a private member servletContext =
-            // filterConfig.getServletContext();
-            // in you filter init() method or set it here like this:
-            // ServletContext servletContext =
-            // ((HttpServletRequest)request).getSession().getServletContext();
+
+            // Either set a private member
+            //   servletContext = filterConfig.getServletContext();
+            // in your filter init() method or set it here like this:
+            //   ServletContext servletContext =
+            //     ((HttpServletRequest) request).getSession().getServletContext();
             // Note that the above line would fail if you are using any other
             // protocol than http
-    
+
             // Doesn't set this instance as the current instance of
             // FacesContext.getCurrentInstance
             facesContext = contextFactory.getFacesContext(servletContext, request, response, lifecycle);
-    
+
             // Set using our inner class
             InnerFacesContext.setFacesContextAsCurrentInstance(facesContext);
         }

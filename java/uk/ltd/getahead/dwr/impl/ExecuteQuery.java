@@ -284,6 +284,7 @@ public class ExecuteQuery
             throw new RuntimeException(Messages.getString("ExecuteQuery.ErrorNullPost")); //$NON-NLS-1$
         }
 
+        int lines = 0;
         while (true)
         {
             String line = in.readLine();
@@ -292,6 +293,8 @@ public class ExecuteQuery
             {
                 break;
             }
+
+            lines++;
 
             if (line.indexOf('&') != -1)
             {
@@ -314,6 +317,9 @@ public class ExecuteQuery
             }
         }
 
+log.debug("read data in " + lines + " lines"); //$NON-NLS-1$ //$NON-NLS-2$
+log.debug("pre check: paramMap.size=" + paramMap.size()); //$NON-NLS-1$
+
         // If there is only 1 param then this must be a broken Safari. All
         // the parameters have got dumped on one line split with \n
         // See: http://bugzilla.opendarwin.org/show_bug.cgi?id=3565
@@ -322,11 +328,10 @@ public class ExecuteQuery
         //      http://developer.apple.com/internet/safari/uamatrix.html
         if (paramMap.size() == 1)
         {
+            // This looks like a broken Mac where the line endings are confused
             log.debug("Using Broken Safari POST mode"); //$NON-NLS-1$
 
-            // This looks like a broken Mac where the line endings are confused
-
-            // Iterators insist that we call hasNext() before we start
+            // Iterators insist that we call hasNext() before we next()
             Iterator it = paramMap.keySet().iterator();
             if (!it.hasNext())
             {
@@ -335,7 +340,7 @@ public class ExecuteQuery
 
             // So get the first
             String key = (String) it.next();
-            String value = (String) paramMap.get(key);
+            String value = (String) paramMap.remove(key);
             String line = key + ConversionConstants.INBOUND_DECL_SEPARATOR + value;
 
             StringTokenizer st = new StringTokenizer(line, "\n"); //$NON-NLS-1$
@@ -346,6 +351,7 @@ public class ExecuteQuery
 
                 parsePostLine(part, paramMap);
             }
+log.debug("post check: paramMap.size=" + paramMap.size()); //$NON-NLS-1$
         }
 
         return paramMap;
