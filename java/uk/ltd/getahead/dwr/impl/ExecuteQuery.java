@@ -317,9 +317,6 @@ public class ExecuteQuery
             }
         }
 
-log.debug("read data in " + lines + " lines"); //$NON-NLS-1$ //$NON-NLS-2$
-log.debug("pre check: paramMap.size=" + paramMap.size()); //$NON-NLS-1$
-
         // If there is only 1 param then this must be a broken Safari. All
         // the parameters have got dumped on one line split with \n
         // See: http://bugzilla.opendarwin.org/show_bug.cgi?id=3565
@@ -351,7 +348,6 @@ log.debug("pre check: paramMap.size=" + paramMap.size()); //$NON-NLS-1$
 
                 parsePostLine(part, paramMap);
             }
-log.debug("post check: paramMap.size=" + paramMap.size()); //$NON-NLS-1$
         }
 
         return paramMap;
