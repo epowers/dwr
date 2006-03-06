@@ -3,6 +3,10 @@
 
 <dwr>
 
+  <init>
+    <converter id="testbean" class="uk.ltd.getahead.testdwr.TestBean2Converter"/>
+  </init>
+
   <allow>
 
     <create creator="new" javascript="Test" scope="application">
@@ -15,6 +19,9 @@
       <auth method="getMinutes" role="admin"/>
       <auth method="getMinutes" role="devel"/>
     </create>
+
+    <convert converter="bean" match="$Proxy*"/>
+    <convert converter="testbean" match="uk.ltd.getahead.testdwr.TestBean"/>
 
     <convert converter="bean" match="uk.ltd.getahead.testdwr.ObjB"/>
     <convert converter="object" match="uk.ltd.getahead.testdwr.ObjA">
