@@ -3,18 +3,9 @@
 
 <dwr>
 
-  <init>
-    <converter id="testbean" class="uk.ltd.getahead.testdwr.TestBean2Converter"/>
-  </init>
-
   <allow>
-    <!--
-    Security testing
-    <convert converter="bean" match="uk.ltd.getahead.dwr.*"/>
-    <create creator="new" javascript="Error" class="uk.ltd.getahead.dwr.InboundContext"/>
-    -->
 
-    <create creator="new" javascript="Test">
+    <create creator="new" javascript="Test" scope="application">
       <param name="class" value="uk.ltd.getahead.testdwr.Test"/>
     </create>
 
@@ -24,42 +15,6 @@
       <auth method="getMinutes" role="admin"/>
       <auth method="getMinutes" role="devel"/>
     </create>
-
-    <!--
-    <create creator="new" javascript="OptionSetter">
-      <param name="class" value="uk.ltd.getahead.testdwr.OptionSetter"/>
-    </create>
-    -->
-
-    <create creator="spring" javascript="SpringTest">
-      <param name="beanName" value="SpringTest"/>
-    </create>
-
-    <create creator="script" javascript="ScriptTest">
-      <param name="language" value="beanshell"/>
-      <param name="script">
-        return new uk.ltd.getahead.testdwr.Test();
-      </param>
-    </create>
-
-    <create creator="new" javascript="NewApplTest" scope="application">
-      <param name="class" value="uk.ltd.getahead.testdwr.Test"/>
-    </create>
-
-    <create creator="new" javascript="NewSessTest" scope="session">
-      <param name="class" value="uk.ltd.getahead.testdwr.Test"/>
-    </create>
-
-    <create creator="new" javascript="NewRequTest" scope="request">
-      <param name="class" value="uk.ltd.getahead.testdwr.Test"/>
-    </create>
-
-    <create creator="new" javascript="NewPageTest" scope="page">
-      <param name="class" value="uk.ltd.getahead.testdwr.Test"/>
-    </create>
-
-    <convert converter="bean" match="$Proxy*"/>
-    <convert converter="testbean" match="uk.ltd.getahead.testdwr.TestBean"/>
 
     <convert converter="bean" match="uk.ltd.getahead.testdwr.ObjB"/>
     <convert converter="object" match="uk.ltd.getahead.testdwr.ObjA">
