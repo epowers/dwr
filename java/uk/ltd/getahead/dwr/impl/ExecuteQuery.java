@@ -136,7 +136,7 @@ public class ExecuteQuery
                     }
                     catch (ConversionException ex)
                     {
-                        throw new ConversionException(Messages.getString("ExecuteQuery.ConversionError", call.getScriptName(), call.getMethodName(), ex.getMessage())); //$NON-NLS-1$
+                        throw new ConversionException(Messages.getString("ExecuteQuery.ConversionError", call.getScriptName(), call.getMethodName(), ex.getMessage()), ex); //$NON-NLS-1$
                     }
                 }
 
