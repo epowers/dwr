@@ -57,7 +57,7 @@ public class JsfCreator extends AbstractCreator implements Creator
     public Object getInstance() throws InstantiationException
     {
         FacesContext facesContext = FacesContext.getCurrentInstance();    
-        if (facesContext != null)
+        if (facesContext == null)
         {
             log.error("Object " + getManagedBeanName() + " cannot be created since the faces context is null"); //$NON-NLS-1$ //$NON-NLS-2$
             return null;
