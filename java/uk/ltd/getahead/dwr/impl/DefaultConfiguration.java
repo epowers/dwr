@@ -138,11 +138,11 @@ public class DefaultConfiguration implements Configuration
         }
         catch (NoClassDefFoundError ex)
         {
-            log.info("Missing classdef for creator '" + id + "'. Failed to load " + classname + ". Cause: " + ex.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            log.info("Creator '" + id + "' not loaded due to NoClassDefFoundError. This is only an problem if you wanted to use it. Cause: " + ex.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
         }
         catch (ClassNotFoundException ex)
         {
-            log.info("Missing class for creator '" + id + "'. Failed to load " + classname + ". Cause: " + ex.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            log.info("Creator '" + id + "' not loaded due to ClassNotFoundException. This is only an problem if you wanted to use it. Cause: " + ex.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
         }
         catch (Exception ex)
         {
@@ -166,11 +166,11 @@ public class DefaultConfiguration implements Configuration
         }
         catch (NoClassDefFoundError ex)
         {
-            log.info("Missing classdef for converter '" + id + "'. Failed to load " + classname + ". Cause: " + ex.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            log.info("Converter '" + id + "' not loaded due to NoClassDefFoundError. This is only an problem if you wanted to use it. Cause: " + ex.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
         }
         catch (ClassNotFoundException ex)
         {
-            log.info("Missing class for converter '" + id + "'. Failed to load " + classname + ". Cause: " + ex.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            log.info("Converter '" + id + "' not loaded due to ClassNotFoundException. This is only an problem if you wanted to use it. Cause: " + ex.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
         }
         catch (Exception ex)
         {
@@ -219,7 +219,7 @@ public class DefaultConfiguration implements Configuration
         }
         catch (NoClassDefFoundError ex)
         {
-            log.info("Missing class for convertor '" + type + "'. (match='" + match + "'). Cause: " + ex.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            log.info("Convertor '" + type + "' not loaded due to NoClassDefFoundError. (match='" + match + "'). Cause: " + ex.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         }
         catch (Exception ex)
         {
@@ -260,7 +260,7 @@ public class DefaultConfiguration implements Configuration
         }
         catch (NoClassDefFoundError ex)
         {
-            log.info("Missing class for creator '" + type + "'. (javascript='" + javascript + "'). Cause: " + ex.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            log.info("Creator '" + type + "' not loaded due to NoClassDefFoundError. (javascript='" + javascript + "'). Cause: " + ex.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         }
         catch (Exception ex)
         {
