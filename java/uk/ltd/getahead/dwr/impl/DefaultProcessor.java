@@ -50,19 +50,17 @@ public class DefaultProcessor implements Processor
     {
         String pathInfo = req.getPathInfo();
         String servletPath = req.getServletPath();
-        if (pathInfo == null)
+
+        if (nullPathInfoWorkaround && pathInfo == null)
         {
             pathInfo = req.getServletPath();
             servletPath = HtmlConstants.PATH_ROOT;
             log.debug("Default servlet suspected. pathInfo=" + pathInfo + "; contextPath=" + req.getContextPath() + "; servletPath=" + servletPath); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         }
 
-        // NOTE: I'm not totally happy with the if statment, there doesn't
-        // appear to be logic to it, just hack-till-its-not-broken which feels
-        // like a good way to create latent bugs
-        if (pathInfo.length() == 0 ||
-            pathInfo.equals(HtmlConstants.PATH_ROOT) ||
-            pathInfo.equals(req.getContextPath()))
+        if (pathInfo == null ||
+            pathInfo.length() == 0 ||
+            pathInfo.equals(HtmlConstants.PATH_ROOT))
         {
             resp.sendRedirect(req.getContextPath() + servletPath + HtmlConstants.FILE_INDEX);
         }
@@ -140,6 +138,21 @@ public class DefaultProcessor implements Processor
     {
         this.test = test;
     }
+
+    /**
+     * Do we use our hack for when pathInfo is null?
+     * @param nullPathInfoWorkaround The nullPathInfoWorkaround to set.
+     */
+    public void setNullPathInfoWorkaround(String nullPathInfoWorkaround)
+    {
+        this.nullPathInfoWorkaround = Boolean.valueOf(nullPathInfoWorkaround).booleanValue();
+    }
+
+    /**
+     * Do we use our hack for when pathInfo is null?
+     * Enabling this will require you to have a / on the end of the DWR root URL
+     */
+    private boolean nullPathInfoWorkaround = false;
 
     private Processor index;
     private Processor test;
