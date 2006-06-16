@@ -527,22 +527,22 @@ DWREngine._stateChange = function(batch) {
   if (!batch.completed && batch.req.readyState == 4) {
     try {
       var reply = batch.req.responseText;
-      var status = batch.req.status;
 
       if (reply == null || reply == "") {
         DWREngine._handleMetaDataError(null, "No data received from server");
         return;
       }
 
+      var contentType = batch.req.getResponseHeader('Content-Type');
+      if (!contentType.match(/^text\/plain/) && !contentType.match(/^text\/javascript/)) {
+        DWREngine._handleMetaDataError(null, "Invalid content from server");
+      }
+      // Skip checking the xhr.status because the above will do for most errors
+      // and because it causes Mozilla to error
+
       // This should get us out of 404s etc.
       if (reply.search("DWREngine._handle") == -1) {
         DWREngine._handleMetaDataError(null, "Invalid reply from server");
-        return;
-      }
-
-      if (status != 200) {
-        if (reply == null) reply = "Unknown error occured";
-        DWREngine._handleMetaDataError(null, reply);
         return;
       }
 
