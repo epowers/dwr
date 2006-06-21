@@ -136,6 +136,14 @@ public class DefaultContainer implements Container
 
                                 continue methods;
                             }
+                            else if (propertyType == Integer.TYPE && setting.getClass() == String.class)
+                            {
+                                Integer integer = Integer.valueOf((String) setting);
+                                log.debug("- autowire-by-name: " + name + "=" + integer); //$NON-NLS-1$ //$NON-NLS-2$
+                                invoke(setter, ovalue, integer);
+
+                                continue methods;
+                            }
                         }
 
                         // Next we try autowire-by-type
