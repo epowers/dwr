@@ -432,7 +432,7 @@ DWREngine._sendData = function(batch) {
       }
 
       try {
-        batch.req.open("GET", batch.path + "/plainjs/" + urlPostfix + "?" + query, batch.async);
+        batch.req.open("GET", batch.path + "/exec/" + urlPostfix + "?" + query, batch.async);
         batch.req.send(null);
         if (!batch.async) {
           DWREngine._stateChange(batch);
