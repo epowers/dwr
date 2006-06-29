@@ -5,7 +5,7 @@
 	<artifactId>dwr</artifactId>
 	<packaging>jar</packaging>
 	<name>Direct Web Remoting</name>
-	<version>1.1.1</version>
+	<version>1.1.2.RC1</version>
 	<description>
 		DWR is easy Ajax for Java.
 	</description>
