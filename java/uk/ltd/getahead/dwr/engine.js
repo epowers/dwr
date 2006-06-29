@@ -16,11 +16,8 @@
 
 /**
  * Declare a constructor function to which we can add real functions.
- * @constructor
  */
-if (DWREngine == null) {
-  var DWREngine = {};
-}
+if (DWREngine == null) var DWREngine = {};
 
 /**
  * Set an alternative error handler from the default alert box.
@@ -371,10 +368,7 @@ DWREngine._sendData = function(batch) {
   batch.preHooks = null;
   // Set a timeout
   if (batch.timeout && batch.timeout != 0) {
-    batch.interval = setInterval(function() {
-      clearInterval(batch.interval);
-      DWREngine._abortRequest(batch);
-    }, batch.timeout);
+    batch.interval = setInterval(function() { DWREngine._abortRequest(batch); }, batch.timeout);
   }
   // A quick string to help people that use web log analysers
   var urlPostfix;
@@ -391,7 +385,7 @@ DWREngine._sendData = function(batch) {
       batch.req = new XMLHttpRequest();
     }
     // IE5 for the mac claims to support window.ActiveXObject, but throws an error when it's used
-    else if (window.ActiveXObject && !(navigator.userAgent.indexOf('Mac') >= 0 && navigator.userAgent.indexOf("MSIE") >= 0)) {
+    else if (window.ActiveXObject && !(navigator.userAgent.indexOf("Mac") >= 0 && navigator.userAgent.indexOf("MSIE") >= 0)) {
       batch.req = DWREngine._newActiveXObject(DWREngine._XMLHTTP);
     }
   }
@@ -404,19 +398,13 @@ DWREngine._sendData = function(batch) {
     batch.map.xml = "true";
     // Proceed using XMLHttpRequest
     if (batch.async) {
-      batch.req.onreadystatechange = function() {
-        DWREngine._stateChange(batch);
-      };
+      batch.req.onreadystatechange = function() { DWREngine._stateChange(batch); };
     }
     // Workaround for Safari 1.x POST bug
-    var indexSafari = navigator.userAgent.indexOf('Safari/');
+    var indexSafari = navigator.userAgent.indexOf("Safari/");
     if (indexSafari >= 0) {
-      // So this is Safari, are we on 1.x? POST is broken
       var version = navigator.userAgent.substring(indexSafari + 7);
-      var verNum = parseInt(version, 10);
-      if (verNum < 400) {
-        batch.verb == "GET";
-      }
+      if (parseInt(version, 10) < 400) batch.verb == "GET";
     }
     if (batch.verb == "GET") {
       // Some browsers (Opera/Safari2) seem to fail to convert the value
@@ -434,9 +422,7 @@ DWREngine._sendData = function(batch) {
       try {
         batch.req.open("GET", batch.path + "/exec/" + urlPostfix + "?" + query, batch.async);
         batch.req.send(null);
-        if (!batch.async) {
-          DWREngine._stateChange(batch);
-        }
+        if (!batch.async) DWREngine._stateChange(batch);
       }
       catch (ex) {
         DWREngine._handleMetaDataError(null, ex);
@@ -450,10 +436,6 @@ DWREngine._sendData = function(batch) {
       }
 
       try {
-        // This might include Safari too, but it shouldn't do any harm
-        //   if (navigator.userAgent.indexOf('Gecko') >= 0) {
-        //     batch.req.setRequestHeader('Connection', 'close');
-        //   }
         batch.req.open("POST", batch.path + "/exec/" + urlPostfix, batch.async);
         batch.req.setRequestHeader('Content-Type', 'text/plain');
         batch.req.send(query);
@@ -468,11 +450,11 @@ DWREngine._sendData = function(batch) {
     batch.map.xml = "false";
     var idname = "dwr-if-" + batch.map["c0-id"];
     // Proceed using iframe
-    batch.div = document.createElement('div');
+    batch.div = document.createElement("div");
     batch.div.innerHTML = "<iframe src='javascript:void(0)' frameborder='0' width='0' height='0' id='" + idname + "' name='" + idname + "'></iframe>";
     document.body.appendChild(batch.div);
     batch.iframe = document.getElementById(idname);
-    batch.iframe.setAttribute('style', 'width:0px; height:0px; border:0px;');
+    batch.iframe.setAttribute("style", "width:0px; height:0px; border:0px;");
 
     if (batch.verb == "GET") {
       for (prop in batch.map) {
@@ -482,21 +464,21 @@ DWREngine._sendData = function(batch) {
       }
       query = query.substring(0, query.length - 1);
 
-      batch.iframe.setAttribute('src', batch.path + "/exec/" + urlPostfix + "?" + query);
+      batch.iframe.setAttribute("src", batch.path + "/exec/" + urlPostfix + "?" + query);
       document.body.appendChild(batch.iframe);
     }
     else {
-      batch.form = document.createElement('form');
-      batch.form.setAttribute('id', 'dwr-form');
-      batch.form.setAttribute('action', batch.path + "/exec" + urlPostfix);
-      batch.form.setAttribute('target', idname);
+      batch.form = document.createElement("form");
+      batch.form.setAttribute("id", "dwr-form");
+      batch.form.setAttribute("action", batch.path + "/exec" + urlPostfix);
+      batch.form.setAttribute("target", idname);
       batch.form.target = idname;
-      batch.form.setAttribute('method', 'post');
+      batch.form.setAttribute("method", "POST");
       for (prop in batch.map) {
-        var formInput = document.createElement('input');
-        formInput.setAttribute('type', 'hidden');
-        formInput.setAttribute('name', prop);
-        formInput.setAttribute('value', batch.map[prop]);
+        var formInput = document.createElement("input");
+        formInput.setAttribute("type", "hidden");
+        formInput.setAttribute("name", prop);
+        formInput.setAttribute("value", batch.map[prop]);
         batch.form.appendChild(formInput);
       }
       document.body.appendChild(batch.form);
@@ -559,7 +541,7 @@ DWREngine._handleResponse = function(id, reply) {
   // Clear this callback out of the list - we don't need it any more
   var handlers = DWREngine._handlersMap[id];
   DWREngine._handlersMap[id] = null;
-  // TODO: How can we do this - delete DWREngine._handlersMap.id
+
   if (handlers) {
     // Error handlers inside here indicate an error that is nothing to do
     // with DWR so we handle them differently.
@@ -586,12 +568,9 @@ DWREngine._handleServerError = function(id, error) {
   // Clear this callback out of the list - we don't need it any more
   var handlers = DWREngine._handlersMap[id];
   DWREngine._handlersMap[id] = null;
-  if (error.message) {
-    DWREngine._handleMetaDataError(handlers, error.message, error);
-  }
-  else {
-    DWREngine._handleMetaDataError(handlers, error);
-  }
+
+  if (error.message) DWREngine._handleMetaDataError(handlers, error.message, error);
+  else DWREngine._handleMetaDataError(handlers, error);
 };
 
 /** @private This is a hack to make the context be this window */
@@ -601,15 +580,14 @@ DWREngine._eval = function(script) {
 
 /** @private Called as a result of a request timeout */
 DWREngine._abortRequest = function(batch) {
-  if (batch && batch.metadata != null && !batch.completed) {
+  if (batch && !batch.completed) {
+    clearInterval(batch.interval);
     DWREngine._clearUp(batch);
     if (batch.req) batch.req.abort();
     // Call all the timeout errorHandlers
     var handlers;
-    var id;
     for (var i = 0; i < batch.ids.length; i++) {
-      id = batch.ids[i];
-      handlers = DWREngine._handlersMap[id];
+      handlers = DWREngine._handlersMap[batch.ids[i]];
       DWREngine._handleMetaDataError(handlers, "Timeout");
     }
   }
@@ -685,15 +663,12 @@ DWREngine._serializeAll = function(batch, referto, data, name) {
   case "boolean":
     batch.map[name] = "boolean:" + data;
     break;
-
   case "number":
     batch.map[name] = "number:" + data;
     break;
-
   case "string":
     batch.map[name] = "string:" + encodeURIComponent(data);
     break;
-
   case "object":
     if (data instanceof String) batch.map[name] = "String:" + encodeURIComponent(data);
     else if (data instanceof Boolean) batch.map[name] = "Boolean:" + data;
@@ -702,11 +677,9 @@ DWREngine._serializeAll = function(batch, referto, data, name) {
     else if (data instanceof Array) batch.map[name] = DWREngine._serializeArray(batch, referto, data, name);
     else batch.map[name] = DWREngine._serializeObject(batch, referto, data, name);
     break;
-
   case "function":
     // We just ignore functions.
     break;
-
   default:
     DWREngine._handleWarning("Unexpected type: " + typeof data + ", attempting default converter.");
     batch.map[name] = "default:" + data;
@@ -749,11 +722,7 @@ DWREngine._serializeObject = function(batch, referto, data, name) {
       var childName = "c" + DWREngine._batch.map.callCount + "-e" + batch.paramCount;
       DWREngine._serializeAll(batch, referto, data[element], childName);
 
-      reply += encodeURIComponent(element);
-      reply += ":reference:";
-      reply += childName;
-      reply += ", ";
-    }
+    reply += encodeURIComponent(element) + ":reference:" + childName + ", ";
   }
 
   if (reply.substring(reply.length - 2) == ", ") {
@@ -770,13 +739,9 @@ DWREngine._serializeXml = function(batch, referto, data, name) {
   if (ref) return ref;
 
   var output;
-  if (window.XMLSerializer) {
-    var serializer = new XMLSerializer();
-    output = serializer.serializeToString(data);
-  }
-  else {
-    output = data.toXml;
-  }
+  if (window.XMLSerializer) output = new XMLSerializer().serializeToString(data);
+  else output = data.toXml;
+
   return "XML:" + encodeURIComponent(output);
 };
 
@@ -814,12 +779,11 @@ DWREngine._unserializeDocument = function(xml) {
   }
   else if (window.ActiveXObject) {
     dom = DWREngine._newActiveXObject(DWREngine._DOMDocument);
-    dom.loadXML(xml);
-    // What happens on parse fail with IE?
+    dom.loadXML(xml); // What happens on parse fail with IE?
     return dom;
   }
   else {
-    var div = document.createElement('div');
+    var div = document.createElement("div");
     div.innerHTML = xml;
     return div;
   }
@@ -836,8 +800,7 @@ DWREngine._newActiveXObject = function(axarray) {
       returnValue = new ActiveXObject(axarray[i]);
       break;
     }
-    catch (ex) {
-    }
+    catch (ex) { /* ignore */ }
   }
   return returnValue;
 };
