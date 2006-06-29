@@ -57,17 +57,10 @@ function callOnLoad(load) {
 /**
  * eval() breaks when we use it to get an object using the { a:42, b:'x' }
  * syntax because it thinks that { and } surround a block and not an object
- * So we wrap it in an array and extract the first element to get around
- * this.
- * The regex = [start of line][whitespace]{[stuff]}[whitespace][end of line]
+ * So we wrap it in () to get around this.
  */
 function objectEval(text) {
-  text = text.replace(/\n/g, " ");
-  text = text.replace(/\r/g, " ");
-  if (text.match(/^\s*\{.*\}\s*$/)) {
-    text = "[" + text + "][0]";
-  }
-  return eval(text);
+  return eval("(" + text + ")");
 }
 
 /**
@@ -91,8 +84,8 @@ function testEquals(actual, expected, depth) {
     return true; // we wont get here of course ...
   }
 
-  if (expected instanceof Object) {
-    if (!(actual instanceof Object)) {
+  if (typeof expected == "object") {
+    if (!(typeof actual == "object")) {
       return "expected object, actual not an object";
     }
 
@@ -113,7 +106,6 @@ function testEquals(actual, expected, depth) {
     if (actualLength != expectedLength) {
       return "expected object size = " + expectedLength + ", actual object size = " + actualLength;
     }
-
     return true;
   }
 
@@ -125,11 +117,9 @@ function testEquals(actual, expected, depth) {
     if (!(actual instanceof Array)) {
       return "expected array, actual not an array";
     }
-
     if (actual.length != expected.length) {
       return "expected array length = " + expected.length + ", actual array length = " + actual.length;
     }
-
     for (var i = 0; i < actual.length; i++) {
       var inner = testEquals(actual[i], expected[i], depth + 1);
       if (typeof inner != "boolean" || !inner) {

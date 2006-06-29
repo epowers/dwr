@@ -107,6 +107,14 @@ DWREngine.setAsync = function(async) {
 };
 
 /**
+ * Setter for the text/html handler - what happens if a DWR request gets an HTML
+ * reply rather than the expected Javascript. Often due to login timeout
+ */
+DWREngine.setTextHtmlHandler = function(handler) {
+  DWREngine._textHtmlHandler = handler;
+}
+
+/**
  * The default message handler.
  * @see http://getahead.ltd.uk/dwr/browser/engine/errors
  */
@@ -115,7 +123,10 @@ DWREngine.defaultMessageHandler = function(message) {
     alert("Error: " + message.description);
   }
   else {
-    alert(message);
+    // Ignore NS_ERROR_NOT_AVAILABLE
+    if (message.toString().indexOf("0x80040111") == -1) {
+      alert(message);
+    }
   }
 };
 
@@ -498,9 +509,15 @@ DWREngine._stateChange = function(batch) {
         return;
       }
 
-      var contentType = batch.req.getResponseHeader('Content-Type');
+      var contentType = batch.req.getResponseHeader("Content-Type");
       if (!contentType.match(/^text\/plain/) && !contentType.match(/^text\/javascript/)) {
-        DWREngine._handleMetaDataWarning(null, "Invalid content from server");
+        if (DWREngine._textHtmlHandler && contentType.match(/^text\/html/)) {
+          DWREngine._textHtmlHandler();
+          return;
+        }
+        else {
+          DWREngine._handleMetaDataWarning(null, "Invalid content type from server: '" + contentType + "'");
+        }
       }
       // Skip checking the xhr.status because the above will do for most errors
       // and because it causes Mozilla to error
@@ -716,11 +733,10 @@ DWREngine._serializeObject = function(batch, referto, data, name) {
   // treat objects as an associative arrays
   var reply = "Object:{";
   var element;
-  for (element in data)  {
-    if (element != "dwrSerialize") {
-      batch.paramCount++;
-      var childName = "c" + DWREngine._batch.map.callCount + "-e" + batch.paramCount;
-      DWREngine._serializeAll(batch, referto, data[element], childName);
+  for (element in data) {
+    batch.paramCount++;
+    var childName = "c" + DWREngine._batch.map.callCount + "-e" + batch.paramCount;
+    DWREngine._serializeAll(batch, referto, data[element], childName);
 
     reply += encodeURIComponent(element) + ":reference:" + childName + ", ";
   }

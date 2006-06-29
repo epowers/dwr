@@ -1,3 +1,4 @@
+// This file is in UTF-8
 
 var failures;
 var failreport;
@@ -221,6 +222,10 @@ tests[tests.length] = { code:"charParam", data:"\u00C7" };
 tests[tests.length] = { code:"charParam", data:"\u00C6" };
 tests[tests.length] = { code:"charParam", data:"\u00DF" };
 tests[tests.length] = { code:"charParam", data:"\u00FF" };
+
+// This line should contain a string of non-western characters and no question marks
+tests[tests.length] = { code:"stringParam", data:"一部BBC在1994年拍的老片子~~可是我却看了又看！可是相当的吸引人啊~~简·奥斯丁的名著，就不用说了吧~~不看不知道，看了绝对不会后悔！一部BBC在1994年拍的老片子~~可是我却看了又看！可是相当的吸引人啊~~简·奥斯丁的名著，就不用说了吧~~不看不知道，看了绝对不会后悔！" };
+tests[tests.length] = { code:"stringParam", data:"\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\" };
 
 var nested = { integer:0, string:'0123456789' };
 nested.testBean = nested;
@@ -452,79 +457,6 @@ function catchFailure(data) {
   failreport.innerHTML = failcount;
 }
 
-function testEquals(actual, expected, depth) {
-  // Rather than failing we assume that it works!
-  if (depth > 10) {
-    return true;
-  }
-
-  if (expected == null) {
-    if (actual != null) {
-      return "expected: null, actual non-null: " + DWRUtil.toDescriptiveString(actual);
-    }
-    return true;
-  }
-
-  if (actual == null) {
-    if (expected != null) {
-      return "actual: null, expected non-null: " + DWRUtil.toDescriptiveString(expected);
-    }
-    // wont get here of course ...
-    return true;
-  }
-
-  if (expected instanceof Object) {
-    if (!(actual instanceof Object)) {
-      return "expected object, actual not an object";
-    }
-
-    var actualLength = 0;
-    for (var prop in actual) {
-      if (typeof actual[prop] != "function" || typeof expected[prop] != "function") {
-        var nest = testEquals(actual[prop], expected[prop], depth + 1);
-        if (typeof nest != "boolean" || !nest) {
-          return "element '" + prop + "' does not match: " + nest;
-        }
-      }
-      actualLength++;
-    }
-
-    // need to check length too
-    var expectedLength = 0;
-    for (prop in expected) {
-      expectedLength++;
-    }
-
-    if (actualLength != expectedLength) {
-      return "expected object size = " + expectedLength + ", actual object size = " + actualLength;
-    }
-    return true;
-  }
-
-  if (actual != expected) {
-    return "expected = " + expected + " (type=" + typeof expected + "), actual = " + actual + " (type=" + typeof actual + ")";
-  }
-
-  if (expected instanceof Array) {
-    if (!(actual instanceof Array)) {
-      return "expected array, actual not an array";
-    }
-    if (actual.length != expected.length) {
-      return "expected array length = " + expected.length + ", actual array length = " + actual.length;
-    }
-    for (var i = 0; i < actual.length; i++) {
-      var inner = testEquals(actual[i], expected[i], depth + 1);
-      if (typeof inner != "boolean" || !inner) {
-        return "element " + i + " does not match: " + inner;
-      }
-    }
-
-    return true;
-  }
-
-  return true;
-}
-
 function runTest(num) {
   var numele = $("t" + num + "-num");
   numele.style.backgroundColor = "#ff8";
@@ -544,39 +476,25 @@ function init() {
   DWREngine.setErrorHandler(catchFailure);
   DWREngine.setWarningHandler(catchFailure);
 
-  var rownum = 0;
   DWRUtil.addRows("chart", tests, [
-    function(row) {
-      var td = document.createElement("td");
-      td.setAttribute("id", "t" + rownum + "-num");
-      td.innerHTML = "" + rownum;
-      return td;
-    },
-    function(row) {
-      var td = document.createElement("td");
-      td.setAttribute("id", "t" + rownum + "-code");
-      td.innerHTML = "" + row.code;
-      return td;
-    },
-    function(row) {
-      var td = document.createElement("td");
-      td.setAttribute("id", "t" + rownum + "-data");
+    function(row, options) { return options.rowNum; },
+    function(row, options) { return "" + row.code; },
+    function(row, options) {
       var display = DWRUtil.toDescriptiveString(row.data);
-      if (display.length > 30) {
-        display = display.substring(0, 27) + "...";
-      }
-      td.innerHTML = display;
-      return td;
+      if (display.length > 30) display = display.substring(0, 27) + "...";
+      return display;
     },
-    function(row) {
-      return "<input type='button' value='Test' onclick='setSettings();runTest(" + rownum + ")'/>";
+    function(row, options) {
+      return "<input type='button' value='Test' onclick='setSettings();runTest(" + options.rowNum + ")'/>";
     },
-    function(row) {
+    function(row, options) { return ""; }
+  ], {
+    cellCreator:function(options) {
       var td = document.createElement("td");
-      td.setAttribute("id", "t" + rownum + "-results");
-      td.innerHTML = "";
-      rownum++;
+      td.setAttribute("id", "t" + options.rowNum + cellNumIdSuffix[options.cellNum]);
       return td;
     }
-  ]);
+  });
 }
+
+var cellNumIdSuffix = [ "-num", "-code", "-data", "-button", "-results" ];
