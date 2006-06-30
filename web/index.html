@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -30,88 +31,12 @@
       $("reply").style.display = "block";
     }
   </script>
-  <link rel="stylesheet" type="text/css" href="generic.css" />
 </head>
 
 <body onload="init()">
 
-<div id="page-title">[
-  <a href="http://getahead.ltd.uk/dwr/">DWR Website</a>
-]</div>
-
-<div style="float:right;"><a href="http://getahead.ltd.uk/dwr/"><img border="0" src="logo.gif"/></a></div>
-
-<h1>Welcome to DWR</h1>
-
-<p>For general information about DWR see:</p>
-
-<ul>
-  <li>The <a href="http://getahead.ltd.uk/dwr/">main DWR website</a>.</li>
-  <li><a href="http://getahead.ltd.uk/blog/joe/">Joe Walker's blog</a>.</li>
-</ul>
-
-<p>Examples within this WAR file:</p>
-<ul>
-  <li>
-    <a href="simpletext/index.html">Dynamic Text</a>:
-    A very simple documented example that updates a page with some text.
-  </li>
-  <li>
-    <a href="simpletext/resource.html">Resource Forwarding</a>:
-    How to dynmically include the contents of one page in another.
-  </li>
-  <li>
-    <a href="asmg">Anti-Spam mailto: Generator</a>:
-    Generate clickable mailto: links without attracting spam.
-  </li>
-  <li>
-    <a href="livehelp/index.html">Live Help</a>:
-    Use multiple-browsers to update a single form.
-  </li>
-  <li>
-    <a href="clock/index.html">Server-Side Clock</a>:
-    A clock that is updated by the server using ReverseAjax. Demonstrates access
-    from a non-http thread.
-  </li>
-  <li>
-    <a href="chat/javascript-chat.html">Javascript Chat</a>:
-    A simple chat application using DWR with conventional Javascript/DWRUtil
-  </li>
-  <li>
-    <a href="chat/java-chat.html">Java Chat</a>:
-    As above except with much reduced Javascript, preferring Java/DwrUtil
-  </li>
-</ul>
-
-<p>Current Configuration:</p>
-
-<ul>
-  <li>The generated <a href='dwr/'>configuration/test pages</a>.</li>
-</ul>
-
-<p>Self test pages:</p>
-
-<ul>
-  <!--
-  <li>
-    <a href="test/integrationTest.html">Integration Test</a>
-    (Pages that test DWR can work with Spring, Struts, XOM, JDOM, DOM4J, DOM, Hibernate)
-  </li>
-  -->
-  <li>
-    <a href="test/marshalling.html">Marshalling Test</a>
-    (Can DWR marshall all parameters, can they be done under load)
-  </li>
-  <li>
-    <a href="test/dhtml.html">DHTML Test</a>
-    (Can DWRUtil manipulate the DOM properly)
-  </li>
-</ul>
-
-<hr/>
-
 <div id="start">
-  <p><strong>DWR is testing installation ...</strong></p>
+  <h1>DWR is testing installation ...</h1>
   <p>
     DWR uses Javascript to make some initial checks. If you can see this message
     then either you are a very fast reader, or Javascript is not working
@@ -126,7 +51,7 @@
 </div>
 
 <div id="reply" style="display:none;">
-  <p><strong>DWR is partially working</strong></p>
+  <h1>DWR is partially working</h1>
   <p>
     DWR has received test data from the server, however for some reason this
     data was mangled. Please report this error to the
@@ -138,7 +63,7 @@
 </div>
 
 <div id="file" style="display:none;">
-  <p><strong>Missing DWR Javascript Functions</strong></p>
+  <h1>Missing DWR Javascript Functions</h1>
   <p>
     This is a fairly advanced page that tests DWR to check that everything is
     setup properly for you.
@@ -150,11 +75,6 @@
     problem please use DWR from within a servlet container.
   </p>
   <p>
-    Also there could be an issue with your browser. Try viewing this page in a
-    different browser, particularly try a browser with a Javascript console.
-    Errors reported in the Javascript console could help diagnose the problem.
-  </p>
-  <p>
     If this is not the cause of the problem, please report it to the
     <a href="http://getahead.ltd.uk/dwr/support">DWR mailing list</a>, including
     your browser, server, OS configuration and any error messages that appeared
@@ -164,7 +84,7 @@
 </div>
 
 <div id="error" style="display:none;">
-  <p><strong>DWR is testing installation ...</strong></p>
+  <h1>DWR is testing installation ...</h1>
   <p>
     This is a fairly advanced page that tests DWR. If you can see this message
     for a prolonged period of time then you should check the following:
@@ -189,6 +109,17 @@
     either in the browser (including the Javascript console if one exists) and
     the server console log.
   </p>
+</div>
+
+<div id="more">
+  <p>
+    For general information about DWR see:
+  </p>
+  <ul>
+    <li>The <a href="http://getahead.ltd.uk/dwr/">main DWR website</a>.</li>
+    <li><a href="http://getahead.ltd.uk/blog/joe/">Joe Walker's blog</a>.</li>
+    <li>The <a href="http://en.wikipedia.org/wiki/DWR">DWR page</a> at Wikipedia.</li>
+  </ul>
 </div>
 
 </body>

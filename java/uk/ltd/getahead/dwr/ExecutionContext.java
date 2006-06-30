@@ -16,7 +16,6 @@
 package uk.ltd.getahead.dwr;
 
 import java.io.IOException;
-import java.util.Collection;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -25,18 +24,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.directwebremoting.Container;
-import org.directwebremoting.MarshallException;
-import org.directwebremoting.OutboundVariable;
-import org.directwebremoting.ScriptSession;
-import org.directwebremoting.WebContext;
-import org.directwebremoting.WebContextFactory;
-
-
 /**
  * Class to enable us to access servlet parameters.
  * @author Joe Walker [joe at getahead dot ltd dot uk]
- * @deprecated Use WebContext / WebContextFactory for better results
  */
 public class ExecutionContext implements WebContext
 {
@@ -115,59 +105,11 @@ public class ExecutionContext implements WebContext
     }
 
     /* (non-Javadoc)
-     * @see uk.ltd.getahead.dwr.WebContext#getBrowser()
-     */
-    public ScriptSession getScriptSession()
-    {
-        throw new UnsupportedOperationException("Use WebContextFactory.get().getPage()"); //$NON-NLS-1$
-    }
-
-    /* (non-Javadoc)
-     * @see uk.ltd.getahead.dwr.WebContext#getAllScriptSessions()
-     */
-    public Collection getAllScriptSessions()
-    {
-        throw new UnsupportedOperationException("Use WebContextFactory.get().getAllScriptSessions()"); //$NON-NLS-1$
-    }
-
-    /* (non-Javadoc)
-     * @see uk.ltd.getahead.dwr.WebContext#getScriptSessionsByPage(java.lang.String)
-     */
-    public Collection getScriptSessionsByPage(String page)
-    {
-        throw new UnsupportedOperationException("Use WebContextFactory.get().getScriptSessionsByPage()"); //$NON-NLS-1$
-    }
-
-    /* (non-Javadoc)
      * @see uk.ltd.getahead.dwr.WebContext#getContainer()
      */
     public Container getContainer()
     {
         throw new UnsupportedOperationException("Use WebContextFactory.get().getContainer()"); //$NON-NLS-1$
-    }
-
-    /* (non-Javadoc)
-     * @see uk.ltd.getahead.dwr.WebContext#setScriptSessionId(java.lang.String)
-     */
-    public void setCurrentPageInformation(String page, String scriptSessionId)
-    {
-        throw new UnsupportedOperationException("Use WebContextFactory.get().setPageAndSessionIds()"); //$NON-NLS-1$
-    }
-
-    /* (non-Javadoc)
-     * @see uk.ltd.getahead.dwr.WebContext#toJavascript(java.lang.Object)
-     */
-    public OutboundVariable toJavascript(Object data) throws MarshallException
-    {
-        throw new UnsupportedOperationException("Use WebContextFactory.get().toJavascript()"); //$NON-NLS-1$
-    }
-
-    /* (non-Javadoc)
-     * @see uk.ltd.getahead.dwr.WebContext#getCurrentPage()
-     */
-    public String getCurrentPage()
-    {
-        throw new UnsupportedOperationException("Use WebContextFactory.get().toJavascript()"); //$NON-NLS-1$
     }
 
     /**

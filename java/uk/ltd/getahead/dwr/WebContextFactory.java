@@ -15,26 +15,9 @@
  */
 package uk.ltd.getahead.dwr;
 
-import java.io.IOException;
-import java.util.Collection;
-
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
-import org.directwebremoting.Container;
-import org.directwebremoting.MarshallException;
-import org.directwebremoting.OutboundVariable;
-import org.directwebremoting.ScriptSession;
-import org.directwebremoting.WebContext;
-
 /**
  * Accessor for the current WebContext.
  * @author Joe Walker [joe at getahead dot ltd dot uk]
- * @deprecated Use org.directwebremoting.WebContextFactory 
  */
 public class WebContextFactory
 {
@@ -42,152 +25,29 @@ public class WebContextFactory
      * Accessor for the current WebContext.
      * @return The current WebContext or null if the current thread was not
      * started by DWR.
-     * @deprecated Use org.directwebremoting.WebContextFactory.get()
      */
     public static WebContext get()
     {
-        org.directwebremoting.WebContext wctx = org.directwebremoting.WebContextFactory.get();
-        return new ProxyWebContext(wctx);
+        if (builder == null)
+        {
+            return null;
+        }
+
+        return builder.get();
     }
 
     /**
-     * How we support <code>uk.ltd.getahead.dwr.WebContext</code> when we only
-     * have an <code>org.directwebremoting.WebContext</code>.
-     * @author Joe Walker [joe at getahead dot ltd dot uk]
+     * Internal method to allow us to get the WebContextBuilder from which we
+     * will get WebContext objects
+     * @param builder The factory object (from DWRServlet)
      */
-    private static final class ProxyWebContext implements uk.ltd.getahead.dwr.WebContext
+    protected static void setWebContextBuilder(WebContextBuilder builder)
     {
-        /**
-         * @param proxy
-         */
-        public ProxyWebContext(WebContext proxy)
-        {
-            this.proxy = proxy;
-        }
-
-        /* (non-Javadoc)
-         * @see org.directwebremoting.WebContext#forwardToString(java.lang.String)
-         */
-        public String forwardToString(String url) throws ServletException, IOException
-        {
-            return proxy.forwardToString(url);
-        }
-
-        /* (non-Javadoc)
-         * @see org.directwebremoting.WebContext#getAllScriptSessions()
-         */
-        public Collection getAllScriptSessions()
-        {
-            return proxy.getAllScriptSessions();
-        }
-
-        /* (non-Javadoc)
-         * @see org.directwebremoting.WebContext#getContainer()
-         */
-        public Container getContainer()
-        {
-            return proxy.getContainer();
-        }
-
-        /* (non-Javadoc)
-         * @see org.directwebremoting.WebContext#getCurrentPage()
-         */
-        public String getCurrentPage()
-        {
-            return proxy.getCurrentPage();
-        }
-
-        /* (non-Javadoc)
-         * @see org.directwebremoting.WebContext#getHttpServletRequest()
-         */
-        public HttpServletRequest getHttpServletRequest()
-        {
-            return proxy.getHttpServletRequest();
-        }
-
-        /* (non-Javadoc)
-         * @see org.directwebremoting.WebContext#getHttpServletResponse()
-         */
-        public HttpServletResponse getHttpServletResponse()
-        {
-            return proxy.getHttpServletResponse();
-        }
-
-        /* (non-Javadoc)
-         * @see org.directwebremoting.WebContext#getScriptSession()
-         */
-        public ScriptSession getScriptSession()
-        {
-            return proxy.getScriptSession();
-        }
-
-        /* (non-Javadoc)
-         * @see org.directwebremoting.WebContext#getScriptSessionsByPage(java.lang.String)
-         */
-        public Collection getScriptSessionsByPage(String url)
-        {
-            return proxy.getScriptSessionsByPage(url);
-        }
-
-        /* (non-Javadoc)
-         * @see org.directwebremoting.WebContext#getServletConfig()
-         */
-        public ServletConfig getServletConfig()
-        {
-            return proxy.getServletConfig();
-        }
-
-        /* (non-Javadoc)
-         * @see org.directwebremoting.WebContext#getServletContext()
-         */
-        public ServletContext getServletContext()
-        {
-            return proxy.getServletContext();
-        }
-
-        /* (non-Javadoc)
-         * @see org.directwebremoting.WebContext#getSession()
-         */
-        public HttpSession getSession()
-        {
-            return proxy.getSession();
-        }
-
-        /* (non-Javadoc)
-         * @see org.directwebremoting.WebContext#getSession(boolean)
-         */
-        public HttpSession getSession(boolean create)
-        {
-            return proxy.getSession(create);
-        }
-
-        /* (non-Javadoc)
-         * @see org.directwebremoting.WebContext#getVersion()
-         */
-        public String getVersion()
-        {
-            return proxy.getVersion();
-        }
-
-        /* (non-Javadoc)
-         * @see org.directwebremoting.WebContext#setCurrentPageInformation(java.lang.String, java.lang.String)
-         */
-        public void setCurrentPageInformation(String page, String scriptSessionId)
-        {
-            proxy.setCurrentPageInformation(page, scriptSessionId);
-        }
-
-        /* (non-Javadoc)
-         * @see org.directwebremoting.WebContext#toJavascript(java.lang.Object)
-         */
-        public OutboundVariable toJavascript(Object data) throws MarshallException
-        {
-            return proxy.toJavascript(data);
-        }
-
-        /**
-         * The WebContext that we proxy to
-         */
-        private org.directwebremoting.WebContext proxy;
+        WebContextFactory.builder = builder;
     }
+
+    /**
+     * The WebContextBuilder from which we will get WebContext objects
+     */
+    private static WebContextBuilder builder;
 }
