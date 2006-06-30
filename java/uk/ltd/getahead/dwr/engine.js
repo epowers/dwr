@@ -506,28 +506,29 @@ DWREngine._stateChange = function(batch) {
 
       if (reply == null || reply == "") {
         DWREngine._handleMetaDataWarning(null, "No data received from server");
-        return;
       }
-
-      var contentType = batch.req.getResponseHeader("Content-Type");
-      if (!contentType.match(/^text\/plain/) && !contentType.match(/^text\/javascript/)) {
-        if (DWREngine._textHtmlHandler && contentType.match(/^text\/html/)) {
-          DWREngine._textHtmlHandler();
-          return;
+      else {
+        var contentType = batch.req.getResponseHeader("Content-Type");
+        if (!contentType.match(/^text\/plain/) && !contentType.match(/^text\/javascript/)) {
+          if (DWREngine._textHtmlHandler && contentType.match(/^text\/html/)) {
+            DWREngine._textHtmlHandler();
+          }
+          else {
+            DWREngine._handleMetaDataWarning(null, "Invalid content type from server: '" + contentType + "'");
+          }
         }
         else {
-          DWREngine._handleMetaDataWarning(null, "Invalid content type from server: '" + contentType + "'");
+          // Skip checking the xhr.status because the above will do for most errors
+          // and because it causes Mozilla to error
+
+          if (reply.search("DWREngine._handle") == -1) {
+            DWREngine._handleMetaDataWarning(null, "Invalid reply from server");
+          }
+          else {
+            eval(reply);
+          }
         }
       }
-      // Skip checking the xhr.status because the above will do for most errors
-      // and because it causes Mozilla to error
-
-      // This should get us out of 404s etc.
-      if (reply.search("DWREngine._handle") == -1) {
-        DWREngine._handleMetaDataWarning(null, "Invalid reply from server");
-        return;
-      }
-      eval(reply);
 
       // We're done. Clear up
       DWREngine._clearUp(batch);
