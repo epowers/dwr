@@ -659,7 +659,7 @@ DWREngine._handleMetaDataError = function(handlers, reason, ex) {
 
 /** @private Generic error handling routing to save having null checks everywhere */
 DWREngine._handleMetaDataWarning = function(handlers, reason, ex) {
-  if (handlers && typeof handlers.errorHandler == "function") handlers.errorHandler(reason, ex);
+  if (handlers && typeof handlers.warningHandler == "function") handlers.warningHandler(reason, ex);
   else DWREngine._handleWarning(reason, ex);
 };
 
