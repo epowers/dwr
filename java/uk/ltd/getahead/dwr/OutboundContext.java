@@ -116,12 +116,12 @@ public final class OutboundContext
      * referencial equality on the wrapped object. This is used when
      * we can't have a IdentityHashMap in map.
      */
-    private static class ReferenceWrapper
+    protected static class ReferenceWrapper
     {
         /**
          * @param object The object to wrap
          */
-        private ReferenceWrapper(Object object)
+        protected ReferenceWrapper(Object object)
         {
             this.object = object;
         }

@@ -139,6 +139,12 @@ public class HibernateBeanConverter extends BeanConverter
                     methods.put(key, method);
                 }
 
+                if (method == null)
+                {
+                    log.warn("Failed to find property: " + property); //$NON-NLS-1$
+                    return false;
+                }
+
                 Boolean reply = (Boolean) isPropertyInitialized.invoke(null, new Object[] { data, property });
                 Boolean reply2 = (Boolean) isInitialized.invoke(null, new Object[] { method.invoke(data, new Object[]{ }) });
 
