@@ -119,7 +119,7 @@ public class DefaultWebContext implements WebContext
         StringWriter sout = new StringWriter();
         StringBuffer buffer = sout.getBuffer();
 
-        HttpServletResponse fakeResponse = new SwallowingHttpServletResponse(getHttpServletResponse(), sout);
+        HttpServletResponse fakeResponse = new SwallowingHttpServletResponse(sout, getHttpServletResponse().getCharacterEncoding());
 
         getServletContext().getRequestDispatcher(url).forward(getHttpServletRequest(), fakeResponse);
 
