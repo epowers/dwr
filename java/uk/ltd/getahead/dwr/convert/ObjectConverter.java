@@ -264,7 +264,7 @@ public class ObjectConverter extends BaseV10Converter implements Converter
                     }
 
                     Object output = config.convertInbound(propType, nested, inctx, inctx.getCurrentTypeHintContext());
-                    field.set(bean, new Object[] { output });
+                    field.set(bean, output);
                 }
             }
 
