@@ -30,6 +30,8 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
+import uk.ltd.getahead.dwr.util.Logger;
+
 /**
  * Filter integration for DWR framework. This filter was inspired by this
  * article: http://www.thoughtsabout.net/blog/archives/000033.html
@@ -38,8 +40,6 @@ import javax.servlet.ServletResponse;
  */
 public class FacesExtensionFilter implements Filter
 {
-    private ServletContext servletContext = null;
-
     /* (non-Javadoc)
      * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
      */
@@ -72,8 +72,24 @@ public class FacesExtensionFilter implements Filter
         // Set using our inner class
         InnerFacesContext.setFacesContextAsCurrentInstance(facesContext);
 
-        // call the filter chain
-        chain.doFilter(request, response);
+        try
+        {
+            // call the filter chain
+            chain.doFilter(request, response);
+        }
+        finally
+        {
+            // Clean up after ourselves as FacesContext is a ThreadLocal object
+            try
+            {
+                facesContext.release();
+            }
+            catch (IllegalStateException ex)
+            {
+                // Perhaps the FacesContext has already been released?
+                log.warn("Double release of faces context?", ex); //$NON-NLS-1$
+            }
+        }
     }
 
     /* (non-Javadoc)
@@ -93,4 +109,14 @@ public class FacesExtensionFilter implements Filter
             FacesContext.setCurrentInstance(facesContext);
         }
     }
+
+    /**
+     * The servlet context
+     */
+    private ServletContext servletContext = null;
+
+    /**
+     * The log stream
+     */
+    private static final Logger log = Logger.getLogger(FacesExtensionFilter.class);
 }
