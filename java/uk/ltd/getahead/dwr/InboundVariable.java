@@ -49,6 +49,8 @@ public final class InboundVariable
      */
     private boolean attemptDereference()
     {
+        int maxDepth = 0;
+
         if (ConversionConstants.TYPE_REFERENCE.equals(type))
         {
             while (ConversionConstants.TYPE_REFERENCE.equals(type))
@@ -61,6 +63,12 @@ public final class InboundVariable
 
                 type = cd.type;
                 value = cd.value;
+
+                maxDepth++;
+                if (maxDepth > 20)
+                {
+                    throw new IllegalStateException("Max depth exceeded when dereferencing " + value); //$NON-NLS-1$
+                }
             }
 
             // For references without an explicit variable name, we use the
