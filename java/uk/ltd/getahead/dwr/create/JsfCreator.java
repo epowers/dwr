@@ -17,6 +17,7 @@ package uk.ltd.getahead.dwr.create;
 
 import javax.faces.application.Application;
 import javax.faces.context.FacesContext;
+import javax.faces.el.ValueBinding;
 import javax.faces.el.VariableResolver;
 
 import uk.ltd.getahead.dwr.Creator;
@@ -51,6 +52,7 @@ public class JsfCreator extends AbstractCreator implements Creator
         return instanceType;
     }
 
+
     /* (non-Javadoc)
      * @see uk.ltd.getahead.dwr.Creator#getInstance()
      */
@@ -64,13 +66,35 @@ public class JsfCreator extends AbstractCreator implements Creator
         }
 
         Application application = facesContext.getApplication();
-
-        VariableResolver resolver = application.getVariableResolver();
-        Object resolvedObject = resolver.resolveVariable(facesContext, getManagedBeanName());
-
+        Object resolvedObject = null;
+        
+        if(isVBExpression(getManagedBeanName())) {
+            ValueBinding vb = application.createValueBinding(getManagedBeanName());
+            if(vb != null)
+                resolvedObject = vb.getValue(facesContext);
+        } else {
+            VariableResolver resolver = application.getVariableResolver();
+            resolvedObject = resolver.resolveVariable(facesContext, getManagedBeanName());
+        }
         return resolvedObject;
     }
 
+    /*
+     * Determine whether String is a value binding expression or not.
+     */
+    public static boolean isVBExpression(String expression) {
+        if (null == expression) {
+            return false;
+        }
+        int start = 0;
+        //check to see if attribute has an expression
+        if (((start = expression.indexOf("#{")) != -1) &&
+            (start < expression.indexOf('}'))) {
+            return true;
+        }
+        return false;
+    }
+    
     /**
      * @return Returns the managedBeanName.
      */
