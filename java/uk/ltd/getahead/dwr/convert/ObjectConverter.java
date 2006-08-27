@@ -16,6 +16,7 @@
 package uk.ltd.getahead.dwr.convert;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -250,7 +251,7 @@ public class ObjectConverter extends BaseV10Converter implements Converter
 
                     InboundVariable nested = new InboundVariable(iv.getLookup(), null, splitType, splitValue);
 
-                    if (!field.isAccessible())
+                    if (!Modifier.isPublic(field.getModifiers()))
                     {
                         if (force)
                         {
@@ -319,7 +320,7 @@ public class ObjectConverter extends BaseV10Converter implements Converter
                         continue;
                     }
 
-                    if (!field.isAccessible())
+                    if (!Modifier.isPublic(field.getModifiers()))
                     {
                         if (force)
                         {
