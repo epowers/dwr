@@ -32,7 +32,8 @@ public class NewCreator extends AbstractCreator implements Creator
     {
         try
         {
-            this.clazz = Class.forName(classname);
+            //this.clazz = Class.forName(classname);
+            this.clazz = Thread.currentThread().getContextClassLoader().loadClass(classname);
         }
         catch (ClassNotFoundException ex)
         {
