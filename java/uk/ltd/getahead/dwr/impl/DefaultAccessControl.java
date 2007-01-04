@@ -42,6 +42,12 @@ public class DefaultAccessControl implements AccessControl
      */
     public String getReasonToNotExecute(HttpServletRequest req, Creator creator, String className, Method method)
     {
+        String problem = getReasonToNotDisplay(req, creator, className, method);
+        if (problem != null)
+        {
+            return problem;
+        }
+
         String methodName = method.getName();
 
         // What if there is some J2EE role based restriction?

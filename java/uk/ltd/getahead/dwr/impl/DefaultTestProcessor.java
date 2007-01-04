@@ -140,18 +140,6 @@ public class DefaultTestProcessor implements Processor
             Method method = methods[i];
             String methodName = method.getName();
 
-            // See also the call to getReasonToNotExecute() above
-            String reason = accessControl.getReasonToNotDisplay(req, creator, scriptName, method);
-            if (reason != null)
-            {
-                out.println(HtmlConstants.BLANK);
-                out.println("<li style='color: #A88;'>  " + methodName + "() is not available: " + reason + "</li>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                if (!allowImpossibleTests)
-                {
-                    continue;
-                }
-            }
-
             // Is it on the list of banned names
             if (jsutil.isReservedWord(methodName))
             {
@@ -259,11 +247,11 @@ public class DefaultTestProcessor implements Processor
                 out.println("<br/><span class='warning'>(Warning: No Converter for " + method.getReturnType().getName() + ". See <a href='#missingConverter'>below</a>)</span>"); //$NON-NLS-1$ //$NON-NLS-2$
             }
 
-            // See also the call to getReasonToNotDisplay() above
-            String warning = accessControl.getReasonToNotExecute(req, creator, scriptName, method);
+            // Just warn if the code can't be displayed
+            String warning = accessControl.getReasonToNotDisplay(req, creator, scriptName, method);
             if (warning != null)
             {
-                out.println("<br/><span class='warning'>(Warning: Role restructions in place: " + warning + ".)</span>"); //$NON-NLS-1$ //$NON-NLS-2$
+                out.println("<br/><span class='warning'>(Warning: Security restructions in place: " + warning + ".)</span>"); //$NON-NLS-1$ //$NON-NLS-2$
             }
 
             out.println("</li>"); //$NON-NLS-1$
@@ -347,15 +335,6 @@ public class DefaultTestProcessor implements Processor
     }
 
     /**
-     * Do we allow impossible tests for debug purposes
-     * @param allowImpossibleTests The allowImpossibleTests to set.
-     */
-    public void setAllowImpossibleTests(boolean allowImpossibleTests)
-    {
-        this.allowImpossibleTests = allowImpossibleTests;
-    }
-
-    /**
      * How we convert parameters
      */
     protected ConverterManager converterManager = null;
@@ -369,11 +348,6 @@ public class DefaultTestProcessor implements Processor
      * The security manager
      */
     protected AccessControl accessControl = null;
-
-    /**
-     * This helps us test that access rules are being followed
-     */
-    private boolean allowImpossibleTests = false;
 
     /**
      * We cache the script output for speed
