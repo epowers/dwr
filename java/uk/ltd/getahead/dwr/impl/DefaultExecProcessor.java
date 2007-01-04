@@ -44,7 +44,7 @@ public class DefaultExecProcessor implements Processor
     {
         try
         {
-            ExecuteQuery eq = new ExecuteQuery(creatorManager, converterManager, accessControl);
+            ExecuteQuery eq = new ExecuteQuery(creatorManager, converterManager, accessControl, maxCallCount);
             Calls calls = eq.execute(req);
 
             for (int i = 0; i < calls.getCallCount(); i++)
@@ -189,6 +189,22 @@ public class DefaultExecProcessor implements Processor
     {
         this.accessControl = accessControl;
     }
+
+    /**
+     * To prevent a DoS attack we limit the max number of calls that can be
+     * made in a batch
+     * @param maxCallCount the maxCallCount to set
+     */
+    public void setMaxCallCount(int maxCallCount)
+    {
+        this.maxCallCount = maxCallCount;
+    }
+
+    /**
+     * To prevent a DoS attack we limit the max number of calls that can be
+     * made in a batch
+     */
+    private int maxCallCount = 20;
 
     /**
      * How we convert parameters

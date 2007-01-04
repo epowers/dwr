@@ -62,12 +62,14 @@ public class ExecuteQuery
      * @param creatorManager The way we get an object to call methods on
      * @param converterManager The way we convert javascript to java
      * @param accessControl The security manager
+     * @param maxCallCount Prevent DoS attacks from high call counts
      */
-    public ExecuteQuery(CreatorManager creatorManager, ConverterManager converterManager, AccessControl accessControl)
+    public ExecuteQuery(CreatorManager creatorManager, ConverterManager converterManager, AccessControl accessControl, int maxCallCount)
     {
         this.creatorManager = creatorManager;
         this.converterManager = converterManager;
         this.accessControl = accessControl;
+        this.maxCallCount = maxCallCount;
     }
 
     /**
@@ -93,7 +95,14 @@ public class ExecuteQuery
         // only one outbound context.
         OutboundContext converted = new OutboundContext();
 
-        for (int callNum = 0; callNum < calls.getCallCount(); callNum++)
+        int callCount = calls.getCallCount();
+        if (callCount > maxCallCount)
+        {
+            log.error("Call count for batch exceeds maxCallCount. Add an init-param of maxCallCount to increase this limit"); //$NON-NLS-1$
+            throw new SecurityException("Call count for batch is too high"); //$NON-NLS-1$
+        }
+
+        for (int callNum = 0; callNum < callCount; callNum++)
         {
             Call call = calls.getCall(callNum);
             InboundContext inctx = call.getInboundContext();
@@ -585,6 +594,12 @@ public class ExecuteQuery
      * The DefaultCreatorManager to which we delegate creation of new objects.
      */
     private CreatorManager creatorManager = null;
+
+    /**
+     * To prevent a DoS attack we limit the max number of calls that can be
+     * made in a batch
+     */
+    private int maxCallCount;
 
     /**
      * The security manager
