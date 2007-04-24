@@ -177,10 +177,6 @@ dwr.util.toDescriptiveString = function(data, showLevels, options) {
     propertyNameMaxLength: 30 
   };
   for (var p in defaultoptions) if (!(p in opt)) opt[p] = defaultoptions[p];
-  if (typeof options == "number") {
-    var baseDepth = options;
-    opt.baseIndent = dwr.util._indent2(baseDepth, opt);
-  }
 
   var skipDomProperties = {
     document:true, ownerDocument:true,
