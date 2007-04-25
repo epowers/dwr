@@ -36,7 +36,8 @@ Reverse Ajax.</p>
       <script
           type="text/javascript"
           src="JSX/js/JSX30.js"
-          jsxapppath="gidemo" jsxlt="true"> </script>
+          jsxapppath="gidemo"
+          jsxlt="true"> </script>
     </div>
 
   </div>
@@ -50,7 +51,7 @@ Reverse Ajax.</p>
       type="text/javascript"
       src="JSX/js/JSX30.js"
       jsxapppath="gidemo" jsxlt="true"&gt; &lt;/script&gt;
-&lt;/div>
+&lt;/div&gt;
 </pre>
 
     <p>This causes GI to render the Matrix component from config.xml and the
@@ -80,12 +81,16 @@ function objectPublished(prefix, name, handlerData, corporation) {
 
     <p>This simply takes the published data and inserts it into the matrix
     component. That's it.</p>
-    
+
+    <p>There are a number of possible repaint strategies, including the simple
+    <code>matrix.repaintData();</code> documented above. The full source
+    contains a strategy that enables cell highlighting</p>
+
     <p>For the full source including the config.xml and appCanvas.xml see the
     source in the war file. They are not expanded on here because TIBCO GI
     comes with a GUI builder to generate them. You don't need to write them
     by hand.</p>
-    
+
   </div>
 
 </div>
