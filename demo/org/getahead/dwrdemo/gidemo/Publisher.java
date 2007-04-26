@@ -64,7 +64,6 @@ public class Publisher implements Runnable
 
                 int timeToSleep = random.nextInt(2500);
                 Thread.sleep(timeToSleep);
-                log.debug("ping to " + sessions.size());
             }
         }
         catch (InterruptedException ex)
