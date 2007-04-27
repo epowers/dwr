@@ -79,10 +79,10 @@ dwr.util.replaceXmlCharacters = function(original) {
  */
 dwr.util.containsXssRiskyCharacters = function(original) {
   return (original.indexOf('&') != -1
-    && original.indexOf('<') != -1
-    && original.indexOf('>') != -1
-    && original.indexOf('\'') != -1
-    && original.indexOf('\"') != -1);
+    || original.indexOf('<') != -1
+    || original.indexOf('>') != -1
+    || original.indexOf('\'') != -1
+    || original.indexOf('\"') != -1);
 }
 
 /**
