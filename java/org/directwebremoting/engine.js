@@ -537,7 +537,7 @@ dwr.engine._getJSessionId =  function() {
     var cookie = cookies[i];
     while (cookie.charAt(0) == ' ') cookie = cookie.substring(1, cookie.length);
     if (cookie.indexOf(dwr.engine._sessionCookieName + "=") == 0) {
-      return cookie.substring(11, cookie.length);
+      return cookie.substring(dwr.engine._sessionCookieName.length + 1, cookie.length);
     }
   }
   return "";
