@@ -16,6 +16,7 @@
 package org.directwebremoting.proxy.dwr;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.directwebremoting.ScriptBuffer;
@@ -89,8 +90,7 @@ public class Util extends ScriptProxy
      */
     public void setValue(String elementId, String value, boolean escapeHtml)
     {
-        String options = escapeHtml ? "{escapeHtml:true}" : "{escapeHtml:false}";
-        addFunctionCall("dwr.util.setValue", elementId, value, options);
+        addFunctionCall("dwr.util.setValue", elementId, value, getEscapeOptions(escapeHtml));
     }
 
     /**
@@ -102,8 +102,7 @@ public class Util extends ScriptProxy
      */
     public void setValues(Map values, boolean escapeHtml)
     {
-        String options = escapeHtml ? "{escapeHtml:true}" : "{escapeHtml:false}";
-        addFunctionCall("dwr.util.setValue", values, options);
+        addFunctionCall("dwr.util.setValues", values, getEscapeOptions(escapeHtml));
     }
 
     /**
@@ -238,8 +237,6 @@ public class Util extends ScriptProxy
     /**
      * Sets a CSS style on an element
      * @param elementId The HTML element to update (by id)
-     * @param selector The CSS selector to update
-     * @param value The new value for the CSS class on the given element
      */
     public void removeNode(String elementId)
     {
@@ -308,5 +305,18 @@ public class Util extends ScriptProxy
               .appendData(value)
               .appendScript(";");
         addScript(script);
+    }
+
+    /**
+     * Internal utility to fetch an options object that contains a single
+     * setting for "escapeHtml"
+     * @param escapeHtml Do we want the client to escape HTML?
+     * @return An options object containing the setting.
+     */
+    private Map getEscapeOptions(boolean escapeHtml)
+    {
+        Map options = new HashMap();
+        options.put("escapeHtml", new Boolean(escapeHtml));
+        return options;
     }
 }
