@@ -79,10 +79,10 @@ dwr.util.replaceXmlCharacters = function(original) {
  */
 dwr.util.containsXssRiskyCharacters = function(original) {
   return (original.indexOf('&') != -1
-    && original.indexOf('<') != -1
-    && original.indexOf('>') != -1
-    && original.indexOf('\'') != -1
-    && original.indexOf('\"') != -1);
+    || original.indexOf('<') != -1
+    || original.indexOf('>') != -1
+    || original.indexOf('\'') != -1
+    || original.indexOf('\"') != -1);
 }
 
 /**
@@ -512,7 +512,7 @@ dwr.util.setValue = function(ele, val, options) {
           if (dwr.util._isArray(val)) {
             node.checked = false;
             for (var j = 0; j < val.length; j++)
-              if (val[i] == node.value) node.checked = true;
+              if (val[j] == node.value) node.checked = true;
           }
           else {
             node.checked = (node.value == val);
@@ -963,6 +963,7 @@ dwr.util.addOptions = function(ele, data/*, options*/) {
       return;
     }
     for (var prop in data) {
+      if (typeof data[prop] == "function") continue;
       options.data = data[prop];
       if (!arg3) {
         options.value = prop;
@@ -1409,17 +1410,17 @@ dwr.util._isObject = function(data) {
 };
 
 /**
- * @private Array detector.
+ * @private Array detector. Note: instanceof doesn't work with multiple frames.
  */
 dwr.util._isArray = function(data) {
   return (data && data.join);
 };
 
 /**
- * @private Date detector.
+ * @private Date detector. Note: instanceof doesn't work with multiple frames.
  */
 dwr.util._isDate = function(data) {
-  return (data && data instanceof Date);
+  return (data && data.toUTCString) ? true : false;
 };
 
 /**
