@@ -43,7 +43,7 @@ dwr.engine.setWarningHandler = function(handler) {
  */
 dwr.engine.setTextHtmlHandler = function(handler) {
   dwr.engine._textHtmlHandler = handler;
-}
+};
 
 /**
  * Set a default timeout value for all calls. 0 (the default) turns timeouts off.
@@ -338,7 +338,7 @@ dwr.engine._parameters = null;
 
 /** Undocumented interceptors - do not use */
 dwr.engine._postSeperator = "\n";
-dwr.engine._defaultInterceptor = function(data) {return data;}
+dwr.engine._defaultInterceptor = function(data) { return data; };
 dwr.engine._urlRewriteHandler = dwr.engine._defaultInterceptor;
 dwr.engine._contentRewriteHandler = dwr.engine._defaultInterceptor;
 dwr.engine._replyRewriteHandler = dwr.engine._defaultInterceptor;
@@ -479,8 +479,8 @@ dwr.engine._createBatch = function() {
       scriptSessionId:dwr.engine._getScriptSessionId()
     },
     charsProcessed:0, paramCount:0,
-    headers:[], parameters:[],
-    isPoll:false, headers:{}, handlers:{}, preHooks:[], postHooks:[],
+    parameters:{}, headers:{},
+    isPoll:false, handlers:{}, preHooks:[], postHooks:[],
     rpcType:dwr.engine._rpcType,
     httpMethod:dwr.engine._httpMethod,
     async:dwr.engine._async,
@@ -505,7 +505,7 @@ dwr.engine._createBatch = function() {
     }
   }
   return batch;
-}
+};
 
 /** @private Take further options and merge them into */
 dwr.engine._mergeBatch = function(batch, overrides) {
@@ -541,7 +541,7 @@ dwr.engine._getJSessionId =  function() {
     }
   }
   return "";
-}
+};
 
 /** @private Check for reverse Ajax activity */
 dwr.engine._checkCometPoll = function() {
@@ -689,23 +689,36 @@ dwr.engine._sendData = function(batch) {
     }
   }
   else if (batch.rpcType != dwr.engine.ScriptTag) {
-    // Proceed using iframe
     var idname = batch.isPoll ? "dwr-if-poll-" + batch.map.batchId : "dwr-if-" + batch.map["c0-id"];
-    batch.div = document.createElement("div");
-    // Add the div to the document first, otherwise IE 6 will ignore onload handler.
-    document.body.appendChild(batch.div);
-    batch.div.innerHTML = "<iframe src='javascript:void(0)' frameborder='0' style='width:0px;height:0px;border:0;' id='" + idname + "' name='" + idname + "' onload='dwr.engine._iframeLoadingComplete (" + batch.map.batchId + ");'></iframe>";
-    batch.iframe = document.getElementById(idname);
+    // on IE try to use the htmlfile activex control
+    if (window.ActiveXObject) {
+      batch.htmlfile = new window.ActiveXObject("htmlfile");
+      batch.htmlfile.open();
+      batch.htmlfile.write("<html>");
+      //batch.htmlfile.write("<script>document.domain='" + document.domain + "';</script>");
+      batch.htmlfile.write("<div><iframe className='wibble' src='javascript:void(0)' id='" + idname + "' name='" + idname + "' onload='dwr.engine._iframeLoadingComplete(" + batch.map.batchId + ");'></iframe></div>");
+      batch.htmlfile.write("</html>");
+      batch.htmlfile.close();
+      batch.htmlfile.parentWindow.dwr = dwr;
+      batch.document = batch.htmlfile;
+    }
+    else {
+      batch.div = document.createElement("div");
+      // Add the div to the document first, otherwise IE 6 will ignore onload handler.
+      document.body.appendChild(batch.div);
+      batch.div.innerHTML = "<iframe src='javascript:void(0)' frameborder='0' style='width:0px;height:0px;border:0;' id='" + idname + "' name='" + idname + "' onload='dwr.engine._iframeLoadingComplete (" + batch.map.batchId + ");'></iframe>";
+      batch.document = document;
+    }
+    batch.iframe = batch.document.getElementById(idname);
     batch.iframe.batch = batch;
     batch.mode = batch.isPoll ? dwr.engine._ModeHtmlPoll : dwr.engine._ModeHtmlCall;
     if (batch.isPoll) dwr.engine._outstandingIFrames.push(batch.iframe);
     request = dwr.engine._constructRequest(batch);
     if (batch.httpMethod == "GET") {
       batch.iframe.setAttribute("src", request.url);
-      // document.body.appendChild(batch.iframe);
     }
     else {
-      batch.form = document.createElement("form");
+      batch.form = batch.document.createElement("form");
       batch.form.setAttribute("id", "dwr-form");
       batch.form.setAttribute("action", request.url);
       batch.form.setAttribute("target", idname);
@@ -714,14 +727,14 @@ dwr.engine._sendData = function(batch) {
       for (prop in batch.map) {
         var value = batch.map[prop];
         if (typeof value != "function") {
-          var formInput = document.createElement("input");
+          var formInput = batch.document.createElement("input");
           formInput.setAttribute("type", "hidden");
           formInput.setAttribute("name", prop);
           formInput.setAttribute("value", value);
           batch.form.appendChild(formInput);
         }
       }
-      document.body.appendChild(batch.form);
+      batch.document.body.appendChild(batch.form);
       batch.form.submit();
     }
   }
@@ -985,7 +998,7 @@ dwr.engine._callPostHooks = function(batch) {
     }
     batch.postHooks = null;
   }
-}
+};
 
 /** @private A call has finished by whatever means and we need to shut it all down. */
 dwr.engine._clearUp = function(batch) {
