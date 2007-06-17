@@ -29,7 +29,7 @@ dwr.util._escapeHtml = true;
  */
 dwr.util.setEscapeHtml = function(escapeHtml) {
   dwr.util._escapeHtml = escapeHtml;
-}
+};
 
 /** @private Work out from an options list and global settings if we should be esccaping */
 dwr.util._shouldEscapeHtml = function(options) {
@@ -37,7 +37,7 @@ dwr.util._shouldEscapeHtml = function(options) {
     return options.escapeHtml;
   }
   return dwr.util._escapeHtml;
-}
+};
 
 /**
  * Return a string with &, <, >, ' and " replaced with their entities
@@ -48,7 +48,7 @@ dwr.util.escapeHtml = function(original) {
   var text = document.createTextNode(original);
   div.appendChild(text);
   return div.innerHTML;
-}
+};
 
 /**
  * Replace common XML entities with characters (see dwr.util.escapeHtml())
@@ -58,7 +58,7 @@ dwr.util.unescapeHtml = function(original) {
   var div = document.createElement('div');
   div.innerHTML = original.replace(/<\/?[^>]+>/gi, '');
   return div.childNodes[0] ? div.childNodes[0].nodeValue : '';
-}
+};
 
 /**
  * Replace characters dangerous for XSS reasons with visually similar characters
@@ -71,7 +71,7 @@ dwr.util.replaceXmlCharacters = function(original) {
   original = original.replace("\'", "\u2018");
   original = original.replace("\"", "\u201C");
   return original;
-}
+};
 
 /**
  * Return true iff the input string contains any XSS dangerous characters
@@ -83,7 +83,7 @@ dwr.util.containsXssRiskyCharacters = function(original) {
     || original.indexOf('>') != -1
     || original.indexOf('\'') != -1
     || original.indexOf('\"') != -1);
-}
+};
 
 /**
  * Enables you to react to return being pressed in an input
@@ -176,7 +176,11 @@ dwr.util.toDescriptiveString = function(data, showLevels, options) {
     shortStringMaxLength: 13,
     propertyNameMaxLength: 30 
   };
-  for (var p in defaultoptions) if (!(p in opt)) opt[p] = defaultoptions[p];
+  for (var p in defaultoptions) {
+    if (!(p in opt)) {
+      opt[p] = defaultoptions[p];
+    }
+  }
 
   var skipDomProperties = {
     document:true, ownerDocument:true,
@@ -339,7 +343,7 @@ dwr.util.toDescriptiveString = function(data, showLevels, options) {
   };
   
   return recursive(data, showLevels, 0, opt);
-}
+};
 
 /**
  * Setup a GMail style loading message.
@@ -466,9 +470,6 @@ dwr.util.highlight = function(ele, options) {
 dwr.util.setValue = function(ele, val, options) {
   if (val == null) val = "";
   if (options == null) options = {};
-  if (dwr.util._shouldEscapeHtml(options) && typeof(val) == "string") {
-    val = dwr.util.escapeHtml(val);
-  }
 
   var orig = ele;
   if (typeof ele == "string") {
@@ -515,7 +516,9 @@ dwr.util.setValue = function(ele, val, options) {
           }
         }
       }
-      else ele.checked = (val == true);
+      else {
+        ele.checked = (val == true);
+      }
     }
     else ele.value = val;
 
@@ -536,8 +539,15 @@ dwr.util.setValue = function(ele, val, options) {
     return;
   }
 
-  // Fall back to innerHTML
-  ele.innerHTML = val;
+  // Fall back to innerHTML and friends
+  if (dwr.util._shouldEscapeHtml(options) && typeof(val) == "string") {
+    if (ele.textContent) ele.textContent = val;
+    else if (ele.innerText) ele.innerText = val;
+    else ele.innerHTML = dwr.util.escapeHtml(val);
+  }
+  else {
+    ele.innerHTML = val;
+  }
 };
 
 /**
@@ -595,12 +605,7 @@ dwr.util._selectListItem = function(ele, val) {
   if (found) return;
 
   for (i = 0; i < ele.options.length; i++) {
-    if (ele.options[i].text == val) {
-      ele.options[i].selected = true;
-    }
-    else {
-      ele.options[i].selected = false;
-    }
+    ele.options[i].selected = (ele.options[i].text == val);
   }
 };
 
@@ -1342,7 +1347,7 @@ dwr.util._cloneSubArrays = function(data, idpath, options) {
       dwr.util._cloneSubArrays(value, idpath + "." + prop, options);
     }
   }
-}
+};
 
 /**
  * @private Helper to turn a string into an element with an error message
