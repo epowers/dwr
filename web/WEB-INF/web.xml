@@ -39,6 +39,12 @@
       <param-name>maxWaitAfterWrite</param-name>
       <param-value>500</param-value>
     </init-param>
+    <!--
+    <init-param>
+      <param-name>org.directwebremoting.extend.ServerLoadMonitor</param-name>
+      <param-value>org.directwebremoting.impl.PollingServerLoadMonitor</param-value>
+    </init-param>
+    -->
     <load-on-startup>1</load-on-startup>
   </servlet>
 

@@ -157,26 +157,12 @@ dwr.engine.setActiveReverseAjax = function(activeReverseAjax) {
 };
 
 /**
- * Set the preferred polling type.
- * @param newPollType One of dwr.engine.XMLHttpRequest or dwr.engine.IFrame
- * @see getahead.org/dwr/browser/engine/options
- */
-dwr.engine.setPollType = function(newPollType) {
-  if (newPollType != dwr.engine.XMLHttpRequest && newPollType != dwr.engine.IFrame) {
-    dwr.engine._handleError(null, { name:"dwr.engine.invalidPollType", message:"PollType must be one of dwr.engine.XMLHttpRequest or dwr.engine.IFrame"  });
-    return;
-  }
-  dwr.engine._pollType = newPollType;
-};
-
-/**
  * The default message handler.
  * @see getahead.org/dwr/browser/engine/errors
  */
 dwr.engine.defaultErrorHandler = function(message, ex) {
   dwr.engine._debug("Error: " + ex.name + ", " + ex.message, true);
-
-  if (message == null || message == "") alert("A server error has occured. More information may be available in the console.");
+  if (message == null || message == "") alert("A server error has occured.");
   // Ignore NS_ERROR_NOT_AVAILABLE if Mozilla is being narky
   else if (message.indexOf("0x80040111") != -1) dwr.engine._debug(message);
   else alert(message);
@@ -231,6 +217,7 @@ dwr.engine.endBatch = function(options) {
 dwr.engine.setPollMethod = function(type) { dwr.engine.setPollType(type); };
 dwr.engine.setMethod = function(type) { dwr.engine.setRpcType(type); };
 dwr.engine.setVerb = function(verb) { dwr.engine.setHttpMethod(verb); };
+dwr.engine.setPollType = function() { dwr.engine._debug("Manually setting the Poll Type is not supported"); };
 
 //==============================================================================
 // Only private stuff below here
@@ -250,6 +237,9 @@ dwr.engine._scriptTagProtection = "${scriptTagProtection}";
 
 /** The default path to the DWR servlet */
 dwr.engine._defaultPath = "${defaultPath}";
+
+/** Do we use XHR for reverse ajax because we are not streaming? */
+dwr.engine._pollWithXhr = "${pollWithXhr}";
 
 /** The read page id that we calculate */
 dwr.engine._scriptSessionId = null;
@@ -309,10 +299,6 @@ dwr.engine._XMLHTTP = ["Msxml2.XMLHTTP.6.0", "Msxml2.XMLHTTP.5.0", "Msxml2.XMLHT
 
 /** Are we doing comet or polling? */
 dwr.engine._activeReverseAjax = false;
-
-/** What is the default polling type */
-dwr.engine._pollType = dwr.engine.XMLHttpRequest;
-//dwr.engine._pollType = dwr.engine.IFrame;
 
 /** The iframe that we are using to poll */
 dwr.engine._outstandingIFrames = [];
@@ -421,17 +407,27 @@ dwr.engine._poll = function(overridePath) {
   batch.map.id = 0; // TODO: Do we need this??
   batch.map.callCount = 1;
   batch.isPoll = true;
-  if (navigator.userAgent.indexOf("Gecko/") != -1) {
-    batch.rpcType = dwr.engine._pollType;
-    batch.map.partialResponse = dwr.engine._partialResponseYes;
-  }
-  else if (document.all) {
-    batch.rpcType = dwr.engine.IFrame;
-    batch.map.partialResponse = dwr.engine._partialResponseFlush;
+  if (dwr.engine._pollWithXhr == "true") {
+    batch.rpcType = dwr.engine.XMLHttpRequest;
+    batch.map.partialResponse = dwr.engine._partialResponseNo;
   }
   else {
-    batch.rpcType = dwr.engine._pollType;
-    batch.map.partialResponse = dwr.engine._partialResponseNo;
+    if (navigator.userAgent.indexOf("Gecko/") != -1) {
+      batch.rpcType = dwr.engine.XMLHttpRequest;
+      batch.map.partialResponse = dwr.engine._partialResponseYes;
+    }
+    else if (navigator.userAgent.indexOf("; MSIE")) {
+      batch.rpcType = dwr.engine.XMLHttpRequest;
+      batch.map.partialResponse = dwr.engine._partialResponseNo;
+    }
+    else if (navigator.userAgent.indexOf("Safari/")) {
+      batch.rpcType = dwr.engine.IFrame;
+      batch.map.partialResponse = dwr.engine._partialResponseYes;
+    }
+    else {
+      batch.rpcType = dwr.engine.XMLHttpRequest;
+      batch.map.partialResponse = dwr.engine._partialResponseNo;
+    }
   }
   batch.httpMethod = "POST";
   batch.async = true;
@@ -450,8 +446,7 @@ dwr.engine._poll = function(overridePath) {
 
   // Send the data
   dwr.engine._sendData(batch);
-  if (batch.rpcType == dwr.engine.XMLHttpRequest) {
-  // if (batch.map.partialResponse != dwr.engine._partialResponseNo) {
+  if (batch.rpcType == dwr.engine.XMLHttpRequest && batch.map.partialResponse == dwr.engine._partialResponseYes) {
     dwr.engine._checkCometPoll();
   }
 };
@@ -621,7 +616,8 @@ dwr.engine._processCometResponse = function(response, batch) {
 
 /** @private Actually send the block of data in the batch object. */
 dwr.engine._sendData = function(batch) {
-  batch.map.batchId = dwr.engine._nextBatchId++;
+  batch.map.batchId = dwr.engine._nextBatchId;
+  dwr.engine._nextBatchId++;
   dwr.engine._batches[batch.map.batchId] = batch;
   dwr.engine._batchesLength++;
   batch.completed = false;
@@ -655,8 +651,7 @@ dwr.engine._sendData = function(batch) {
     if (batch.isPoll) {
       dwr.engine._pollReq = batch.req;
       // In IE XHR is an ActiveX control so you can't augment it like this
-      // however batch.isPoll uses IFrame on IE so were safe here
-      batch.req.batch = batch;
+      if (!document.all) batch.req.batch = batch;
     }
     // Workaround for Safari 1.x POST bug
     var indexSafari = navigator.userAgent.indexOf("Safari/");
@@ -691,7 +686,7 @@ dwr.engine._sendData = function(batch) {
   else if (batch.rpcType != dwr.engine.ScriptTag) {
     var idname = batch.isPoll ? "dwr-if-poll-" + batch.map.batchId : "dwr-if-" + batch.map["c0-id"];
     // on IE try to use the htmlfile activex control
-    if (window.ActiveXObject) {
+    if (batch.isPoll && window.ActiveXObject) {
       batch.htmlfile = new window.ActiveXObject("htmlfile");
       batch.htmlfile.open();
       batch.htmlfile.write("<html>");
@@ -1048,7 +1043,7 @@ dwr.engine._handleError = function(batch, ex) {
   if (ex.name == null) ex.name = "unknown";
   if (batch && typeof batch.errorHandler == "function") batch.errorHandler(ex.message, ex);
   else if (dwr.engine._errorHandler) dwr.engine._errorHandler(ex.message, ex);
-  dwr.engine._clearUp(batch);
+  if (batch) dwr.engine._clearUp(batch);
 };
 
 /** @private Generic error handling routing to save having null checks everywhere */
@@ -1058,7 +1053,7 @@ dwr.engine._handleWarning = function(batch, ex) {
   if (ex.name == null) ex.name = "unknown";
   if (batch && typeof batch.warningHandler == "function") batch.warningHandler(ex.message, ex);
   else if (dwr.engine._warningHandler) dwr.engine._warningHandler(ex.message, ex);
-  dwr.engine._clearUp(batch);
+  if (batch) dwr.engine._clearUp(batch);
 };
 
 /**
