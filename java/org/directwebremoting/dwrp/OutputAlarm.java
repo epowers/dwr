@@ -16,6 +16,8 @@
 package org.directwebremoting.dwrp;
 
 import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -45,7 +47,6 @@ public class OutputAlarm extends BasicAlarm implements Alarm
      */
     public void setAlarmAction(Sleeper sleeper)
     {
-        log.debug("OutputAlarm looking at a " + sleeper);
         try
         {
             scriptSession.addScriptConduit(conduit);
@@ -63,30 +64,9 @@ public class OutputAlarm extends BasicAlarm implements Alarm
      */
     public void cancel()
     {
-        log.debug("OutputAlarm stopping looking at a " + sleeper);
         scriptSession.removeScriptConduit(conduit);
         super.cancel();
     }
-
-    /**
-     * A conduit to alert us if there is output
-     */
-    protected ScriptConduit conduit = new AlarmScriptConduit();
-
-    /**
-     * How long do we wait after output happens in case there is more output
-     */
-    protected int maxWaitAfterWrite;
-
-    /**
-     * The script session to monitor for output
-     */
-    protected RealScriptSession scriptSession;
-
-    /**
-     * The log stream
-     */
-    protected static final Log log = LogFactory.getLog(OutputAlarm.class);
 
     /**
      * @author Joe Walker [joe at getahead dot ltd dot uk]
@@ -108,27 +88,57 @@ public class OutputAlarm extends BasicAlarm implements Alarm
         {
             log.debug("Output alarm went off. Additional wait of " + maxWaitAfterWrite);
 
-            if (sleeper != null)
+            if (maxWaitAfterWrite == 0)
             {
-                if (maxWaitAfterWrite > 0)
+                raiseAlarm();
+            }
+            else
+            {
+                TimerTask task = new TimerTask()
                 {
-                    try
+                    public void run()
                     {
-                        Thread.sleep(maxWaitAfterWrite);
+                        try
+                        {
+                            raiseAlarm();
+                        }
+                        catch (Exception ex)
+                        {
+                            log.warn("Unexpected error raising alarm", ex);
+                        }
                     }
-                    catch (InterruptedException ex)
-                    {
-                        ex.printStackTrace();
-                    }
-                }
+                };
 
-                if (sleeper != null)
-                {
-                    sleeper.wakeUp();
-                }
+                timer = new Timer();
+                timer.schedule(task, maxWaitAfterWrite);
             }
 
             return false;
         }
     }
+
+    /**
+     * A conduit to alert us if there is output
+     */
+    protected ScriptConduit conduit = new AlarmScriptConduit();
+
+    /**
+     * How long do we wait after output happens in case there is more output
+     */
+    protected int maxWaitAfterWrite;
+
+    /**
+     * The script session to monitor for output
+     */
+    protected RealScriptSession scriptSession;
+
+    /**
+     * The future result that allows us to cancel the timer
+     */
+    protected Timer timer;
+
+    /**
+     * The log stream
+     */
+    protected static final Log log = LogFactory.getLog(OutputAlarm.class);
 }
