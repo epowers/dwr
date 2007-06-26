@@ -462,6 +462,7 @@ dwr.engine._pollErrorHandler = function(msg, ex) {
     setTimeout("dwr.engine._poll()", 10000);
   }
   else {
+    dwr.engine._activeReverseAjax = false;
     dwr.engine._debug("Giving up.");
   }
 };
