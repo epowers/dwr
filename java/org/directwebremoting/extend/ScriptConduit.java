@@ -97,7 +97,7 @@ public abstract class ScriptConduit implements Comparable
     {
         ScriptConduit that = (ScriptConduit) obj;
 
-        int rankdiff = this.getRank() - that.getRank();
+        int rankdiff = that.getRank() - this.getRank();
         if (rankdiff != 0)
         {
             return rankdiff;
@@ -107,22 +107,44 @@ public abstract class ScriptConduit implements Comparable
     }
 
     /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    public boolean equals(Object obj)
+    {
+        if (obj == null)
+        {
+            return false;
+        }
+
+        if (obj == this)
+        {
+            return true;
+        }
+
+        if (!this.getClass().equals(obj.getClass()))
+        {
+            return false;
+        }
+
+        ScriptConduit that = (ScriptConduit) obj;
+        return this.id == that.id;
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
+    public int hashCode()
+    {
+        return 17 + (int) id;
+    }
+
+    /* (non-Javadoc)
      * @see java.lang.Object#toString()
      */
     public String toString()
     {
-        if (classname == null)
-        {
-            classname = LocalUtil.getShortClassName(getClass());
-        }
-
-        return classname + "[id=" + id + "]";
+        return LocalUtil.getShortClassName(getClass()) + "[id=" + id + "]";
     }
-
-    /**
-     * Cached short classname for toString()
-     */
-    private static String classname = null;
 
     /**
      * The rank of this ScriptConduit
