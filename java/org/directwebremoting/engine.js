@@ -419,11 +419,9 @@ dwr.engine._poll = function(overridePath) {
     else if (navigator.userAgent.indexOf("; MSIE")) {
       batch.rpcType = dwr.engine.IFrame;
       batch.map.partialResponse = dwr.engine._partialResponseYes;
-      // batch.rpcType = dwr.engine.XMLHttpRequest;
-      // batch.map.partialResponse = dwr.engine._partialResponseNo;
     }
     else if (navigator.userAgent.indexOf("Safari/")) {
-      batch.rpcType = dwr.engine.IFrame;
+      batch.rpcType = dwr.engine.XMLHttpRequest;
       batch.map.partialResponse = dwr.engine._partialResponseYes;
     }
     else {
