@@ -555,7 +555,7 @@ dwr.engine._checkCometPoll = function() {
   if (dwr.engine._pollReq) {
     var req = dwr.engine._pollReq;
     var text = req.responseText;
-    dwr.engine._processCometResponse(text, req.batch);
+    if (text != null) dwr.engine._processCometResponse(text, req.batch);
   }
 
   // If the poll resources are still there, come back again
