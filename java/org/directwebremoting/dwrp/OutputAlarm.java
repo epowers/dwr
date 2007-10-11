@@ -16,7 +16,6 @@
 package org.directwebremoting.dwrp;
 
 import java.io.IOException;
-import java.util.Timer;
 import java.util.TimerTask;
 
 import org.apache.commons.logging.Log;
@@ -25,6 +24,7 @@ import org.directwebremoting.ScriptBuffer;
 import org.directwebremoting.ScriptSession;
 import org.directwebremoting.extend.RealScriptSession;
 import org.directwebremoting.extend.ScriptConduit;
+import org.directwebremoting.util.StaticTimer;
 
 /**
  * An Alarm that goes off whenever output happens on a {@link ScriptSession}.
@@ -65,6 +65,7 @@ public class OutputAlarm extends BasicAlarm implements Alarm
     public void cancel()
     {
         scriptSession.removeScriptConduit(conduit);
+        task.cancel();
         super.cancel();
     }
 
@@ -94,7 +95,7 @@ public class OutputAlarm extends BasicAlarm implements Alarm
             }
             else
             {
-                TimerTask task = new TimerTask()
+                task = new TimerTask()
                 {
                     public void run()
                     {
@@ -109,8 +110,7 @@ public class OutputAlarm extends BasicAlarm implements Alarm
                     }
                 };
 
-                timer = new Timer();
-                timer.schedule(task, maxWaitAfterWrite);
+                StaticTimer.schedule(task, maxWaitAfterWrite);
             }
 
             return false;
@@ -133,9 +133,9 @@ public class OutputAlarm extends BasicAlarm implements Alarm
     protected RealScriptSession scriptSession;
 
     /**
-     * The future result that allows us to cancel the timer
+     * The task that causes the alarm to go off
      */
-    protected Timer timer;
+    protected TimerTask task;
 
     /**
      * The log stream

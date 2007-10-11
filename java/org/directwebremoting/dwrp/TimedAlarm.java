@@ -15,11 +15,11 @@
  */
 package org.directwebremoting.dwrp;
 
-import java.util.Timer;
 import java.util.TimerTask;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.directwebremoting.util.StaticTimer;
 
 /**
  * An Alarm that goes off after a certain length of time.
@@ -40,7 +40,7 @@ public class TimedAlarm extends BasicAlarm implements Alarm
      */
     public void cancel()
     {
-        timer.cancel();
+        task.cancel();
         super.cancel();
     }
 
@@ -49,7 +49,12 @@ public class TimedAlarm extends BasicAlarm implements Alarm
      */
     public void setAlarmAction(Sleeper sleeper)
     {
-        TimerTask task = new TimerTask()
+        if (task != null)
+        {
+            throw new IllegalStateException("An alarm action has already been set.");
+        }
+
+        task = new TimerTask()
         {
             public void run()
             {
@@ -64,15 +69,14 @@ public class TimedAlarm extends BasicAlarm implements Alarm
             }
         };
 
-        timer = new Timer();
-        timer.schedule(task, waitTime);
+        StaticTimer.schedule(task, waitTime);
         super.setAlarmAction(sleeper);
     }
 
     /**
-     * The future result that allows us to cancel the timer
+     * The task that causes the alarm to go off
      */
-    protected Timer timer;
+    private TimerTask task;
 
     /**
      * How long do we wait for?
