@@ -164,6 +164,7 @@ public class DefaultScriptSessionManager implements ScriptSessionManager
         if (now - scriptSessionCheckTime > lastSessionCheckAt)
         {
             checkTimeouts();
+            lastSessionCheckAt = now;
         }
     }
 
