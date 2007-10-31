@@ -43,7 +43,7 @@ dwr.engine.setWarningHandler = function(handler) {
  */
 dwr.engine.setTextHtmlHandler = function(handler) {
   dwr.engine._textHtmlHandler = handler;
-}
+};
 
 /**
  * Set a default timeout value for all calls. 0 (the default) turns timeouts off.
@@ -157,26 +157,12 @@ dwr.engine.setActiveReverseAjax = function(activeReverseAjax) {
 };
 
 /**
- * Set the preferred polling type.
- * @param newPollType One of dwr.engine.XMLHttpRequest or dwr.engine.IFrame
- * @see getahead.org/dwr/browser/engine/options
- */
-dwr.engine.setPollType = function(newPollType) {
-  if (newPollType != dwr.engine.XMLHttpRequest && newPollType != dwr.engine.IFrame) {
-    dwr.engine._handleError(null, { name:"dwr.engine.invalidPollType", message:"PollType must be one of dwr.engine.XMLHttpRequest or dwr.engine.IFrame"  });
-    return;
-  }
-  dwr.engine._pollType = newPollType;
-};
-
-/**
  * The default message handler.
  * @see getahead.org/dwr/browser/engine/errors
  */
 dwr.engine.defaultErrorHandler = function(message, ex) {
   dwr.engine._debug("Error: " + ex.name + ", " + ex.message, true);
-
-  if (message == null || message == "") alert("A server error has occured. More information may be available in the console.");
+  if (message == null || message == "") alert("A server error has occured.");
   // Ignore NS_ERROR_NOT_AVAILABLE if Mozilla is being narky
   else if (message.indexOf("0x80040111") != -1) dwr.engine._debug(message);
   else alert(message);
@@ -231,6 +217,7 @@ dwr.engine.endBatch = function(options) {
 dwr.engine.setPollMethod = function(type) { dwr.engine.setPollType(type); };
 dwr.engine.setMethod = function(type) { dwr.engine.setRpcType(type); };
 dwr.engine.setVerb = function(verb) { dwr.engine.setHttpMethod(verb); };
+dwr.engine.setPollType = function() { dwr.engine._debug("Manually setting the Poll Type is not supported"); };
 
 //==============================================================================
 // Only private stuff below here
@@ -250,6 +237,9 @@ dwr.engine._scriptTagProtection = "${scriptTagProtection}";
 
 /** The default path to the DWR servlet */
 dwr.engine._defaultPath = "${defaultPath}";
+
+/** Do we use XHR for reverse ajax because we are not streaming? */
+dwr.engine._pollWithXhr = "${pollWithXhr}";
 
 /** The read page id that we calculate */
 dwr.engine._scriptSessionId = null;
@@ -310,10 +300,6 @@ dwr.engine._XMLHTTP = ["Msxml2.XMLHTTP.6.0", "Msxml2.XMLHTTP.5.0", "Msxml2.XMLHT
 /** Are we doing comet or polling? */
 dwr.engine._activeReverseAjax = false;
 
-/** What is the default polling type */
-dwr.engine._pollType = dwr.engine.XMLHttpRequest;
-//dwr.engine._pollType = dwr.engine.IFrame;
-
 /** The iframe that we are using to poll */
 dwr.engine._outstandingIFrames = [];
 
@@ -338,7 +324,7 @@ dwr.engine._parameters = null;
 
 /** Undocumented interceptors - do not use */
 dwr.engine._postSeperator = "\n";
-dwr.engine._defaultInterceptor = function(data) {return data;}
+dwr.engine._defaultInterceptor = function(data) { return data; };
 dwr.engine._urlRewriteHandler = dwr.engine._defaultInterceptor;
 dwr.engine._contentRewriteHandler = dwr.engine._defaultInterceptor;
 dwr.engine._replyRewriteHandler = dwr.engine._defaultInterceptor;
@@ -421,17 +407,27 @@ dwr.engine._poll = function(overridePath) {
   batch.map.id = 0; // TODO: Do we need this??
   batch.map.callCount = 1;
   batch.isPoll = true;
-  if (navigator.userAgent.indexOf("Gecko/") != -1) {
-    batch.rpcType = dwr.engine._pollType;
-    batch.map.partialResponse = dwr.engine._partialResponseYes;
-  }
-  else if (document.all) {
-    batch.rpcType = dwr.engine.IFrame;
-    batch.map.partialResponse = dwr.engine._partialResponseFlush;
+  if (dwr.engine._pollWithXhr == "true") {
+    batch.rpcType = dwr.engine.XMLHttpRequest;
+    batch.map.partialResponse = dwr.engine._partialResponseNo;
   }
   else {
-    batch.rpcType = dwr.engine._pollType;
-    batch.map.partialResponse = dwr.engine._partialResponseNo;
+    if (navigator.userAgent.indexOf("Gecko/") != -1) {
+      batch.rpcType = dwr.engine.XMLHttpRequest;
+      batch.map.partialResponse = dwr.engine._partialResponseYes;
+    }
+    // else if (navigator.userAgent.indexOf("; MSIE")) {
+    //   batch.rpcType = dwr.engine.IFrame;
+    //   batch.map.partialResponse = dwr.engine._partialResponseYes;
+    // }
+    else if (navigator.userAgent.indexOf("Safari/")) {
+      batch.rpcType = dwr.engine.XMLHttpRequest;
+      batch.map.partialResponse = dwr.engine._partialResponseYes;
+    }
+    else {
+      batch.rpcType = dwr.engine.XMLHttpRequest;
+      batch.map.partialResponse = dwr.engine._partialResponseNo;
+    }
   }
   batch.httpMethod = "POST";
   batch.async = true;
@@ -450,8 +446,7 @@ dwr.engine._poll = function(overridePath) {
 
   // Send the data
   dwr.engine._sendData(batch);
-  if (batch.rpcType == dwr.engine.XMLHttpRequest) {
-  // if (batch.map.partialResponse != dwr.engine._partialResponseNo) {
+  if (batch.rpcType == dwr.engine.XMLHttpRequest && batch.map.partialResponse == dwr.engine._partialResponseYes) {
     dwr.engine._checkCometPoll();
   }
 };
@@ -465,6 +460,7 @@ dwr.engine._pollErrorHandler = function(msg, ex) {
     setTimeout("dwr.engine._poll()", 10000);
   }
   else {
+    dwr.engine._activeReverseAjax = false;
     dwr.engine._debug("Giving up.");
   }
 };
@@ -479,8 +475,8 @@ dwr.engine._createBatch = function() {
       scriptSessionId:dwr.engine._getScriptSessionId()
     },
     charsProcessed:0, paramCount:0,
-    headers:[], parameters:[],
-    isPoll:false, headers:{}, handlers:{}, preHooks:[], postHooks:[],
+    parameters:{}, headers:{},
+    isPoll:false, handlers:{}, preHooks:[], postHooks:[],
     rpcType:dwr.engine._rpcType,
     httpMethod:dwr.engine._httpMethod,
     async:dwr.engine._async,
@@ -505,7 +501,7 @@ dwr.engine._createBatch = function() {
     }
   }
   return batch;
-}
+};
 
 /** @private Take further options and merge them into */
 dwr.engine._mergeBatch = function(batch, overrides) {
@@ -537,11 +533,11 @@ dwr.engine._getJSessionId =  function() {
     var cookie = cookies[i];
     while (cookie.charAt(0) == ' ') cookie = cookie.substring(1, cookie.length);
     if (cookie.indexOf(dwr.engine._sessionCookieName + "=") == 0) {
-      return cookie.substring(11, cookie.length);
+      return cookie.substring(dwr.engine._sessionCookieName.length + 1, cookie.length);
     }
   }
   return "";
-}
+};
 
 /** @private Check for reverse Ajax activity */
 dwr.engine._checkCometPoll = function() {
@@ -559,7 +555,7 @@ dwr.engine._checkCometPoll = function() {
   if (dwr.engine._pollReq) {
     var req = dwr.engine._pollReq;
     var text = req.responseText;
-    dwr.engine._processCometResponse(text, req.batch);
+    if (text != null) dwr.engine._processCometResponse(text, req.batch);
   }
 
   // If the poll resources are still there, come back again
@@ -621,7 +617,8 @@ dwr.engine._processCometResponse = function(response, batch) {
 
 /** @private Actually send the block of data in the batch object. */
 dwr.engine._sendData = function(batch) {
-  batch.map.batchId = dwr.engine._nextBatchId++;
+  batch.map.batchId = dwr.engine._nextBatchId;
+  dwr.engine._nextBatchId++;
   dwr.engine._batches[batch.map.batchId] = batch;
   dwr.engine._batchesLength++;
   batch.completed = false;
@@ -655,8 +652,7 @@ dwr.engine._sendData = function(batch) {
     if (batch.isPoll) {
       dwr.engine._pollReq = batch.req;
       // In IE XHR is an ActiveX control so you can't augment it like this
-      // however batch.isPoll uses IFrame on IE so were safe here
-      batch.req.batch = batch;
+      if (!document.all) batch.req.batch = batch;
     }
     // Workaround for Safari 1.x POST bug
     var indexSafari = navigator.userAgent.indexOf("Safari/");
@@ -689,22 +685,36 @@ dwr.engine._sendData = function(batch) {
     }
   }
   else if (batch.rpcType != dwr.engine.ScriptTag) {
-    // Proceed using iframe
     var idname = batch.isPoll ? "dwr-if-poll-" + batch.map.batchId : "dwr-if-" + batch.map["c0-id"];
-    batch.div = document.createElement("div");
-    batch.div.innerHTML = "<iframe src='javascript:void(0)' frameborder='0' style='width:0px;height:0px;border:0;' id='" + idname + "' name='" + idname + "'></iframe>";
-    document.body.appendChild(batch.div);
-    batch.iframe = document.getElementById(idname);
+    // on IE try to use the htmlfile activex control
+    if (batch.isPoll && window.ActiveXObject) {
+      batch.htmlfile = new window.ActiveXObject("htmlfile");
+      batch.htmlfile.open();
+      batch.htmlfile.write("<html>");
+      //batch.htmlfile.write("<script>document.domain='" + document.domain + "';</script>");
+      batch.htmlfile.write("<div><iframe className='wibble' src='javascript:void(0)' id='" + idname + "' name='" + idname + "' onload='dwr.engine._iframeLoadingComplete(" + batch.map.batchId + ");'></iframe></div>");
+      batch.htmlfile.write("</html>");
+      batch.htmlfile.close();
+      batch.htmlfile.parentWindow.dwr = dwr;
+      batch.document = batch.htmlfile;
+    }
+    else {
+      batch.div = document.createElement("div");
+      // Add the div to the document first, otherwise IE 6 will ignore onload handler.
+      document.body.appendChild(batch.div);
+      batch.div.innerHTML = "<iframe src='javascript:void(0)' frameborder='0' style='width:0px;height:0px;border:0;' id='" + idname + "' name='" + idname + "' onload='dwr.engine._iframeLoadingComplete (" + batch.map.batchId + ");'></iframe>";
+      batch.document = document;
+    }
+    batch.iframe = batch.document.getElementById(idname);
     batch.iframe.batch = batch;
     batch.mode = batch.isPoll ? dwr.engine._ModeHtmlPoll : dwr.engine._ModeHtmlCall;
     if (batch.isPoll) dwr.engine._outstandingIFrames.push(batch.iframe);
     request = dwr.engine._constructRequest(batch);
     if (batch.httpMethod == "GET") {
       batch.iframe.setAttribute("src", request.url);
-      // document.body.appendChild(batch.iframe);
     }
     else {
-      batch.form = document.createElement("form");
+      batch.form = batch.document.createElement("form");
       batch.form.setAttribute("id", "dwr-form");
       batch.form.setAttribute("action", request.url);
       batch.form.setAttribute("target", idname);
@@ -713,14 +723,14 @@ dwr.engine._sendData = function(batch) {
       for (prop in batch.map) {
         var value = batch.map[prop];
         if (typeof value != "function") {
-          var formInput = document.createElement("input");
+          var formInput = batch.document.createElement("input");
           formInput.setAttribute("type", "hidden");
           formInput.setAttribute("name", prop);
           formInput.setAttribute("value", value);
           batch.form.appendChild(formInput);
         }
       }
-      document.body.appendChild(batch.form);
+      batch.document.body.appendChild(batch.form);
       batch.form.submit();
     }
   }
@@ -854,9 +864,34 @@ dwr.engine._stateChange = function(batch) {
   if (toEval != null) toEval = toEval.replace(dwr.engine._scriptTagProtection, "");
   dwr.engine._eval(toEval);
   dwr.engine._receivedBatch = null;
-
+  dwr.engine._validateBatch(batch);
   dwr.engine._clearUp(batch);
 };
+
+/**
+ * @private This function is invoked when a batch reply is received.
+ * It checks that there is a response for every call in the batch. Otherwise,
+ * an error will be signaled (a call without a response indicates that the 
+ * server failed to send complete batch response). 
+ */
+dwr.engine._validateBatch = function(batch) {
+  // If some call left unreplied, report an error.
+  if (!batch.completed) {
+    for (var i = 0; i < batch.map.callCount; i++) {
+      if (batch.handlers[i] != null) {
+        dwr.engine._handleWarning(batch, { name:"dwr.engine.incompleteReply", message:"Incomplete reply from server" });
+        break;
+      }
+    }
+  }
+}
+
+/** @private Called from iframe onload, check batch using batch-id */
+dwr.engine._iframeLoadingComplete = function(batchId) {
+  // dwr.engine._checkCometPoll();
+  var batch = dwr.engine._batches[batchId];
+  if (batch) dwr.engine._validateBatch(batch);
+}
 
 /** @private Called by the server: Execute a callback */
 dwr.engine._remoteHandleCallback = function(batchId, callId, reply) {
@@ -869,6 +904,7 @@ dwr.engine._remoteHandleCallback = function(batchId, callId, reply) {
   // with DWR so we handle them differently.
   try {
     var handlers = batch.handlers[callId];
+    batch.handlers[callId] = null;
     if (!handlers) {
       dwr.engine._debug("Warning: Missing handlers. callId=" + callId, true);
     }
@@ -884,6 +920,7 @@ dwr.engine._remoteHandleException = function(batchId, callId, ex) {
   var batch = dwr.engine._batches[batchId];
   if (batch == null) { dwr.engine._debug("Warning: null batch in remoteHandleException", true); return; }
   var handlers = batch.handlers[callId];
+  batch.handlers[callId] = null;
   if (handlers == null) { dwr.engine._debug("Warning: null handlers in remoteHandleException", true); return; }
   if (ex.message == undefined) ex.message = "";
   if (typeof handlers.exceptionHandler == "function") handlers.exceptionHandler(ex.message, ex);
@@ -957,7 +994,7 @@ dwr.engine._callPostHooks = function(batch) {
     }
     batch.postHooks = null;
   }
-}
+};
 
 /** @private A call has finished by whatever means and we need to shut it all down. */
 dwr.engine._clearUp = function(batch) {
@@ -1007,7 +1044,7 @@ dwr.engine._handleError = function(batch, ex) {
   if (ex.name == null) ex.name = "unknown";
   if (batch && typeof batch.errorHandler == "function") batch.errorHandler(ex.message, ex);
   else if (dwr.engine._errorHandler) dwr.engine._errorHandler(ex.message, ex);
-  dwr.engine._clearUp(batch);
+  if (batch) dwr.engine._clearUp(batch);
 };
 
 /** @private Generic error handling routing to save having null checks everywhere */
@@ -1017,7 +1054,7 @@ dwr.engine._handleWarning = function(batch, ex) {
   if (ex.name == null) ex.name = "unknown";
   if (batch && typeof batch.warningHandler == "function") batch.warningHandler(ex.message, ex);
   else if (dwr.engine._warningHandler) dwr.engine._warningHandler(ex.message, ex);
-  dwr.engine._clearUp(batch);
+  if (batch) dwr.engine._clearUp(batch);
 };
 
 /**
