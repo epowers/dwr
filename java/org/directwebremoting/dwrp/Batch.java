@@ -264,21 +264,21 @@ public class Batch
             // The special values
             String callId = (String) paramMap.remove(prefix + ProtocolConstants.INBOUND_KEY_ID);
             call.setCallId(callId);
-            if (!LocalUtil.isLetterOrDigit(callId))
+            if (!LocalUtil.isLetterOrDigitOrUnderline(callId))
             {
                 throw new SecurityException("Call IDs may only contain Java Identifiers");
             }
 
             String scriptName = (String) paramMap.remove(prefix + ProtocolConstants.INBOUND_KEY_SCRIPTNAME);
             call.setScriptName(scriptName);
-            if (!LocalUtil.isLetterOrDigit(scriptName))
+            if (!LocalUtil.isLetterOrDigitOrUnderline(scriptName))
             {
                 throw new SecurityException("Script names may only contain Java Identifiers");
             }
 
             String methodName = (String) paramMap.remove(prefix + ProtocolConstants.INBOUND_KEY_METHODNAME);
             call.setMethodName(methodName);
-            if (!LocalUtil.isLetterOrDigit(methodName))
+            if (!LocalUtil.isLetterOrDigitOrUnderline(methodName))
             {
                 throw new SecurityException("Method names may only contain Java Identifiers");
             }
@@ -304,7 +304,7 @@ public class Batch
 
         String batchId = (String) paramMap.remove(ProtocolConstants.INBOUND_KEY_BATCHID);
         calls.setBatchId(batchId);
-        if (!LocalUtil.isLetterOrDigit(batchId))
+        if (!LocalUtil.isLetterOrDigitOrUnderline(batchId))
         {
             throw new SecurityException("Batch IDs may only contain Java Identifiers");
         }

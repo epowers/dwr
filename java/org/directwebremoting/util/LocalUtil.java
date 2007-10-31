@@ -111,14 +111,14 @@ public final class LocalUtil
             return false;
         }
 
-        if (!Character.isJavaIdentifierStart(test.charAt(0)))
+        if (!Character.isJavaIdentifierStart(test.charAt(0)) && test.charAt(0) != '_')
         {
             return false;
         }
 
         for (int i = 1; i < test.length(); i++)
         {
-            if (!Character.isJavaIdentifierPart(test.charAt(i)))
+            if (!Character.isJavaIdentifierPart(test.charAt(i)) && test.charAt(i) != '_')
             {
                 return false;
             }
@@ -135,7 +135,7 @@ public final class LocalUtil
      * characters that are unicode letters or digits
      * @see Character#isLetterOrDigit(char)
      */
-    public static boolean isLetterOrDigit(String test)
+    public static boolean isLetterOrDigitOrUnderline(String test)
     {
         if (test == null || test.length() == 0)
         {
@@ -144,7 +144,7 @@ public final class LocalUtil
 
         for (int i = 0; i < test.length(); i++)
         {
-            if (!Character.isLetterOrDigit(test.charAt(i)))
+            if (!Character.isLetterOrDigit(test.charAt(i)) && test.charAt(i) != '_')
             {
                 return false;
             }
