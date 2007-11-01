@@ -646,7 +646,9 @@ dwr.engine._sendData = function(batch) {
   if (batch.req) {
     // Proceed using XMLHttpRequest
     if (batch.async) {
-      batch.req.onreadystatechange = function() { dwr.engine._stateChange(batch); };
+      batch.req.onreadystatechange = function() {
+        if (typeof dwr != 'undefined') dwr.engine._stateChange(batch);
+      };
     }
     // If we're polling, record this for monitoring
     if (batch.isPoll) {
