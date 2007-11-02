@@ -13,38 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.directwebremoting.impl;
+package org.getahead.dwrdemo.gidemo;
 
-import org.directwebremoting.extend.ServerLoadMonitor;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
 
 /**
- * A default implementation of ServerLoadMonitor
+ * Allow a Publisher to gracefully shutdown
  * @author Joe Walker [joe at getahead dot ltd dot uk]
  */
-public class SmallSiteServerLoadMonitor extends AbstractServerLoadMonitor implements ServerLoadMonitor
+public class PublisherServletContextListener implements ServletContextListener
 {
     /* (non-Javadoc)
-     * @see org.directwebremoting.extend.ServerLoadMonitor#supportsStreaming()
+     * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
      */
-    public boolean supportsStreaming()
+    public void contextInitialized(ServletContextEvent sce)
     {
-        return true;
     }
 
     /* (non-Javadoc)
-     * @see org.directwebremoting.extend.ServerLoadMonitor#getMaxConnectedTime()
+     * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.ServletContextEvent)
      */
-    public long getConnectedTime()
+    public void contextDestroyed(ServletContextEvent sce)
     {
-        // Start a new poll every 30 minutes
-        return 1800 * 1000;
-    }
-
-    /* (non-Javadoc)
-     * @see org.directwebremoting.ServerLoadMonitor#timeToNextPoll()
-     */
-    public int getDisconnectedTime()
-    {
-        return 1;
+        synchronized (Publisher.class)
+        {
+            if (Publisher.worker != null)
+            {
+                Publisher.worker.interrupt();
+            }
+        }
     }
 }
