@@ -247,7 +247,7 @@ public class Batch
         }
         catch (NumberFormatException ex)
         {
-            throw new ServerException(Messages.getString("BaseCallMarshaller.BadCallCount", callStr));
+            throw new ServerException(Messages.getString("BaseCallMarshaller.BadCallCount"));
         }
 
         // Extract the ids, scriptnames and methodnames
