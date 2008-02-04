@@ -269,7 +269,7 @@ public class EnginePrivate extends ScriptProxy
      */
     private static String addWindowParent(String script)
     {
-        return "try { window.parent." + script + " } catch(ex) { if (ex.message != 'Can\\'t execute code from a freed script') { throw ex; }}";
+        return "try { window.parent." + script + " } catch(ex) { if (!(ex.number && ex.number == -2146823277)) { throw ex; }}";
     }
 
     /**
