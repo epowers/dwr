@@ -23,7 +23,6 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -61,14 +60,27 @@ public class PollHandler implements Handler
      */
     public void handle(HttpServletRequest request, HttpServletResponse response) throws IOException
     {
-        // If we are a restarted jetty continuation then we need to finish off
+        // If you're new to understanding this file, you may wish to skip this
+        // step and come back to it later ;-)
+        // So Jetty does something a bit weird with Ajax Continuations. You
+        // suspend a request (which works via an exception) while keeping hold
+        // of a continuation object. There are methods on this continuation
+        // object to restart the request. Also you can write to the output at
+        // any time the request is suspended. When the continuation is
+        // restarted, rather than restart the thread from where is was
+        // suspended, it starts it from the beginning again. Since we are able
+        // to write to the response outside of the servlet thread, there is no
+        // need for us to do anything if we have been restarted. So we ignore
+        // all Jetty continuation restarts.
         if (JettyContinuationSleeper.isRestart(request))
         {
             JettyContinuationSleeper.restart(request);
             return;
         }
 
-        // The information that we can extract from the input parameters
+        // A PollBatch is the information that we expect from the request.
+        // if the parse fails we can do little more than tell the browser that
+        // something went wrong.
         final PollBatch batch;
         try
         {
@@ -100,28 +112,15 @@ public class PollHandler implements Handler
             return;
         }
 
-        // If we are going to be doing any waiting then check for other threads
-        // from the same browser that are already waiting, and send them on
-        // their way
-        final long maxConnectedTime = serverLoadMonitor.getConnectedTime();
-        if (maxConnectedTime > 0)
-        {
-            // Make other threads from the same browser stop waiting and continue
-            // First we check to see if there is already a connection from the
-            // current browser to this servlet
-            Sleeper otherThread = (Sleeper) request.getSession().getAttribute(ATTRIBUTE_SLEEPER);
-            if (otherThread != null)
-            {
-                otherThread.wakeUp();
-            }
-        }
+        // A script conduit is some route from a ScriptSession back to the page
+        // that belongs to the session. There may be zero or many of these
+        // conduits (although if there are more than 2, something is strange)
+        // All scripts destined for a page go to a ScriptSession and then out
+        // via a ScriptConduit.
+        final RealScriptSession scriptSession = batch.getScriptSession();
 
         // Create a conduit depending on the type of request (from the URL)
         final BaseScriptConduit conduit = createScriptConduit(batch, response);
-
-        // Register the conduit with a script session so messages can get out
-        final RealScriptSession scriptSession = batch.getScriptSession();
-        scriptSession.addScriptConduit(conduit);
 
         // So we're going to go to sleep. How do we wake up?
         final Sleeper sleeper;
@@ -138,7 +137,7 @@ public class PollHandler implements Handler
         // There are various reasons why we want to wake up and carry on ...
         final List alarms = new ArrayList();
 
-        // The conduit might want to say 'I give up'
+        // If the conduit has an error flushing data, it needs to give up
         alarms.add(conduit.getErrorAlarm());
 
         // Set the system up to resume on output (perhaps with delay)
@@ -150,9 +149,10 @@ public class PollHandler implements Handler
         }
 
         // Set the system up to resume anyway after maxConnectedTime
+        long maxConnectedTime = serverLoadMonitor.getConnectedTime();
         alarms.add(new TimedAlarm(maxConnectedTime));
 
-        // We also need to wakeup if the server is being shut down
+        // We also need to wake-up if the server is being shut down
         // WARNING: This code has a non-obvious side effect - The server load
         // monitor (which hands out shutdown messages) also monitors usage by
         // looking at the number of connected alarms.
@@ -165,19 +165,11 @@ public class PollHandler implements Handler
             alarm.setAlarmAction(sleeper);
         }
 
-        // Allow other threads to notice more than one poll thread and to send
-        // this one on it's way
-        final HttpSession session = request.getSession();
-        session.setAttribute(ATTRIBUTE_SLEEPER, sleeper);
-
         // We need to do something sensible when we wake up ...
         Runnable onAwakening = new Runnable()
         {
             public void run()
             {
-                // There is no point in letting other threads try to move us on
-                session.removeAttribute(ATTRIBUTE_SLEEPER);
-
                 // Cancel all the alarms
                 for (Iterator it = alarms.iterator(); it.hasNext();)
                 {
@@ -201,6 +193,14 @@ public class PollHandler implements Handler
             }
         };
 
+        // Register the conduit with a script session so messages can get out.
+        // This must happen late on in this method because this will cause any
+        // scripts cached in the script session (because there was no conduit
+        // available when they were written) to be sent to the conduit.
+        // We need any AlarmScriptConduits to be notified so they can make
+        // maxWaitWfterWrite work for all cases
+        scriptSession.addScriptConduit(conduit);
+
         // Actually go to sleep. This *must* be the last thing in this method to
         // cope with all the methods of affecting Threads. Jetty throws,
         // Weblogic continues, others wait().
@@ -212,7 +212,7 @@ public class PollHandler implements Handler
      * @param batch The parsed request
      * @param response Conduits need a response to write to
      * @return A correctly configured conduit
-     * @throws IOException If the response can't be interogated
+     * @throws IOException If the response can't be interrogated
      */
     private BaseScriptConduit createScriptConduit(PollBatch batch, HttpServletResponse response) throws IOException
     {
@@ -375,11 +375,6 @@ public class PollHandler implements Handler
      * The owner of script sessions
      */
     protected ScriptSessionManager scriptSessionManager = null;
-
-    /**
-     * We remember people that are in a long poll so we can kick them out
-     */
-    private static final String ATTRIBUTE_SLEEPER = "org.directwebremoting.dwrp.sleeper";
 
     /**
      * The log stream
