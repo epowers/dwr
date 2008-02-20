@@ -400,7 +400,7 @@ dwr.engine._execute = function(path, scriptName, methodName, vararg_params) {
 };
 
 /** @private Poll the server to see if there is any data waiting */
-dwr.engine._poll = function(overridePath) {
+dwr.engine._poll = function() {
   if (!dwr.engine._activeReverseAjax) return;
 
   var batch = dwr.engine._createBatch();
@@ -416,14 +416,6 @@ dwr.engine._poll = function(overridePath) {
       batch.rpcType = dwr.engine.XMLHttpRequest;
       batch.map.partialResponse = dwr.engine._partialResponseYes;
     }
-    // else if (navigator.userAgent.indexOf("; MSIE")) {
-    //   batch.rpcType = dwr.engine.IFrame;
-    //   batch.map.partialResponse = dwr.engine._partialResponseYes;
-    // }
-    else if (navigator.userAgent.indexOf("Safari/")) {
-      batch.rpcType = dwr.engine.XMLHttpRequest;
-      batch.map.partialResponse = dwr.engine._partialResponseYes;
-    }
     else {
       batch.rpcType = dwr.engine.XMLHttpRequest;
       batch.map.partialResponse = dwr.engine._partialResponseNo;
@@ -432,7 +424,7 @@ dwr.engine._poll = function(overridePath) {
   batch.httpMethod = "POST";
   batch.async = true;
   batch.timeout = 0;
-  batch.path = (overridePath) ? overridePath : dwr.engine._defaultPath;
+  batch.path = dwr.engine._defaultPath;
   batch.preHooks = [];
   batch.postHooks = [];
   batch.errorHandler = dwr.engine._pollErrorHandler;
@@ -833,7 +825,7 @@ dwr.engine._stateChange = function(batch) {
       var contentType = req.getResponseHeader("Content-Type");
       if (!contentType.match(/^text\/plain/) && !contentType.match(/^text\/javascript/)) {
         if (contentType.match(/^text\/html/) && typeof batch.textHtmlHandler == "function") {
-          batch.textHtmlHandler();
+          batch.textHtmlHandler({ status:status, responseText:reply, contentType:contentType });
         }
         else {
           dwr.engine._handleWarning(batch, { name:"dwr.engine.invalidMimeType", message:"Invalid content type: '" + contentType + "'" });
@@ -1023,7 +1015,7 @@ dwr.engine._clearUp = function(batch) {
     delete batch.req;
   }
 
-  if (batch.map && batch.map.batchId) {
+  if (batch.map && (batch.map.batchId || batch.map.batchId == 0)) {
     delete dwr.engine._batches[batch.map.batchId];
     dwr.engine._batchesLength--;
   }
