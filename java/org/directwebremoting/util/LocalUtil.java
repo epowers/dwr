@@ -111,14 +111,40 @@ public final class LocalUtil
             return false;
         }
 
-        if (!Character.isJavaIdentifierStart(test.charAt(0)))
+        if (!Character.isJavaIdentifierStart(test.charAt(0)) && test.charAt(0) != '_')
         {
             return false;
         }
 
         for (int i = 1; i < test.length(); i++)
         {
-            if (!Character.isJavaIdentifierPart(test.charAt(i)))
+            if (!Character.isJavaIdentifierPart(test.charAt(i)) && test.charAt(i) != '_')
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Determines if the specified string contains only Unicode letters or
+     * digits as defined by {@link Character#isLetterOrDigit(char)}
+     * @param test The string to test
+     * @return true if the string is non-null, non-empty and contains only
+     * characters that are unicode letters or digits
+     * @see Character#isLetterOrDigit(char)
+     */
+    public static boolean isLetterOrDigitOrUnderline(String test)
+    {
+        if (test == null || test.length() == 0)
+        {
+            return false;
+        }
+
+        for (int i = 0; i < test.length(); i++)
+        {
+            if (!Character.isLetterOrDigit(test.charAt(i)) && test.charAt(i) != '_')
             {
                 return false;
             }

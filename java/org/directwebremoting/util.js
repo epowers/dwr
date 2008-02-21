@@ -29,7 +29,7 @@ dwr.util._escapeHtml = true;
  */
 dwr.util.setEscapeHtml = function(escapeHtml) {
   dwr.util._escapeHtml = escapeHtml;
-}
+};
 
 /** @private Work out from an options list and global settings if we should be esccaping */
 dwr.util._shouldEscapeHtml = function(options) {
@@ -37,28 +37,23 @@ dwr.util._shouldEscapeHtml = function(options) {
     return options.escapeHtml;
   }
   return dwr.util._escapeHtml;
-}
+};
 
 /**
- * Return a string with &, <, >, ' and " replaced with their entities
+ * Return a string with &, < and > replaced with their entities
  * @see TODO
  */
 dwr.util.escapeHtml = function(original) {
-  var div = document.createElement('div');
-  var text = document.createTextNode(original);
-  div.appendChild(text);
-  return div.innerHTML;
-}
+  return original.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+};
 
 /**
  * Replace common XML entities with characters (see dwr.util.escapeHtml())
  * @see TODO
  */
 dwr.util.unescapeHtml = function(original) {
-  var div = document.createElement('div');
-  div.innerHTML = original.replace(/<\/?[^>]+>/gi, '');
-  return div.childNodes[0] ? div.childNodes[0].nodeValue : '';
-}
+  return original.replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>');
+};
 
 /**
  * Replace characters dangerous for XSS reasons with visually similar characters
@@ -71,7 +66,7 @@ dwr.util.replaceXmlCharacters = function(original) {
   original = original.replace("\'", "\u2018");
   original = original.replace("\"", "\u201C");
   return original;
-}
+};
 
 /**
  * Return true iff the input string contains any XSS dangerous characters
@@ -79,11 +74,11 @@ dwr.util.replaceXmlCharacters = function(original) {
  */
 dwr.util.containsXssRiskyCharacters = function(original) {
   return (original.indexOf('&') != -1
-    && original.indexOf('<') != -1
-    && original.indexOf('>') != -1
-    && original.indexOf('\'') != -1
-    && original.indexOf('\"') != -1);
-}
+    || original.indexOf('<') != -1
+    || original.indexOf('>') != -1
+    || original.indexOf('\'') != -1
+    || original.indexOf('\"') != -1);
+};
 
 /**
  * Enables you to react to return being pressed in an input
@@ -176,10 +171,10 @@ dwr.util.toDescriptiveString = function(data, showLevels, options) {
     shortStringMaxLength: 13,
     propertyNameMaxLength: 30 
   };
-  for (var p in defaultoptions) if (!(p in opt)) opt[p] = defaultoptions[p];
-  if (typeof options == "number") {
-    var baseDepth = options;
-    opt.baseIndent = dwr.util._indent2(baseDepth, opt);
+  for (var p in defaultoptions) {
+    if (!(p in opt)) {
+      opt[p] = defaultoptions[p];
+    }
   }
 
   var skipDomProperties = {
@@ -343,7 +338,7 @@ dwr.util.toDescriptiveString = function(data, showLevels, options) {
   };
   
   return recursive(data, showLevels, 0, opt);
-}
+};
 
 /**
  * Setup a GMail style loading message.
@@ -470,9 +465,6 @@ dwr.util.highlight = function(ele, options) {
 dwr.util.setValue = function(ele, val, options) {
   if (val == null) val = "";
   if (options == null) options = {};
-  if (dwr.util._shouldEscapeHtml(options) && typeof(val) == "string") {
-    val = dwr.util.escapeHtml(val);
-  }
 
   var orig = ele;
   if (typeof ele == "string") {
@@ -512,14 +504,16 @@ dwr.util.setValue = function(ele, val, options) {
           if (dwr.util._isArray(val)) {
             node.checked = false;
             for (var j = 0; j < val.length; j++)
-              if (val[i] == node.value) node.checked = true;
+              if (val[j] == node.value) node.checked = true;
           }
           else {
             node.checked = (node.value == val);
           }
         }
       }
-      else ele.checked = (val == true);
+      else {
+        ele.checked = (val == true);
+      }
     }
     else ele.value = val;
 
@@ -540,8 +534,15 @@ dwr.util.setValue = function(ele, val, options) {
     return;
   }
 
-  // Fall back to innerHTML
-  ele.innerHTML = val;
+  // Fall back to innerHTML and friends
+  if (dwr.util._shouldEscapeHtml(options) && typeof(val) == "string") {
+    if (ele.textContent) ele.textContent = val;
+    else if (ele.innerText) ele.innerText = val;
+    else ele.innerHTML = dwr.util.escapeHtml(val);
+  }
+  else {
+    ele.innerHTML = val;
+  }
 };
 
 /**
@@ -599,12 +600,7 @@ dwr.util._selectListItem = function(ele, val) {
   if (found) return;
 
   for (i = 0; i < ele.options.length; i++) {
-    if (ele.options[i].text == val) {
-      ele.options[i].selected = true;
-    }
-    else {
-      ele.options[i].selected = false;
-    }
+    ele.options[i].selected = (ele.options[i].text == val);
   }
 };
 
@@ -963,6 +959,7 @@ dwr.util.addOptions = function(ele, data/*, options*/) {
       return;
     }
     for (var prop in data) {
+      if (typeof data[prop] == "function") continue;
       options.data = data[prop];
       if (!arg3) {
         options.value = prop;
@@ -1345,7 +1342,7 @@ dwr.util._cloneSubArrays = function(data, idpath, options) {
       dwr.util._cloneSubArrays(value, idpath + "." + prop, options);
     }
   }
-}
+};
 
 /**
  * @private Helper to turn a string into an element with an error message
@@ -1409,17 +1406,17 @@ dwr.util._isObject = function(data) {
 };
 
 /**
- * @private Array detector.
+ * @private Array detector. Note: instanceof doesn't work with multiple frames.
  */
 dwr.util._isArray = function(data) {
   return (data && data.join);
 };
 
 /**
- * @private Date detector.
+ * @private Date detector. Note: instanceof doesn't work with multiple frames.
  */
 dwr.util._isDate = function(data) {
-  return (data && data instanceof Date);
+  return (data && data.toUTCString) ? true : false;
 };
 
 /**

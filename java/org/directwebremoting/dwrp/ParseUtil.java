@@ -18,6 +18,7 @@ package org.directwebremoting.dwrp;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -67,6 +68,19 @@ public class ParseUtil
 
                 if (line == null)
                 {
+                    if (paramMap.isEmpty())
+                    {
+                        // Normally speaking we should just bail out, but if
+                        // we are using DWR with Acegi without ActiveX on IE,
+                        // then Acegi 'fixes' the parameters for us.
+                        Enumeration en = req.getParameterNames();
+                        while (en.hasMoreElements())
+                        {
+                            String name = (String) en.nextElement();
+                            paramMap.put(name, req.getParameter(name));
+                        }
+                    }
+
                     break;
                 }
 

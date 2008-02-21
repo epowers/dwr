@@ -247,7 +247,7 @@ public class Batch
         }
         catch (NumberFormatException ex)
         {
-            throw new ServerException(Messages.getString("BaseCallMarshaller.BadCallCount", callStr));
+            throw new ServerException(Messages.getString("BaseCallMarshaller.BadCallCount"));
         }
 
         // Extract the ids, scriptnames and methodnames
@@ -262,9 +262,26 @@ public class Batch
             String prefix = ProtocolConstants.INBOUND_CALLNUM_PREFIX + callNum + ProtocolConstants.INBOUND_CALLNUM_SUFFIX;
 
             // The special values
-            call.setCallId((String) paramMap.remove(prefix + ProtocolConstants.INBOUND_KEY_ID));
-            call.setScriptName((String) paramMap.remove(prefix + ProtocolConstants.INBOUND_KEY_SCRIPTNAME));
-            call.setMethodName((String) paramMap.remove(prefix + ProtocolConstants.INBOUND_KEY_METHODNAME));
+            String callId = (String) paramMap.remove(prefix + ProtocolConstants.INBOUND_KEY_ID);
+            call.setCallId(callId);
+            if (!LocalUtil.isLetterOrDigitOrUnderline(callId))
+            {
+                throw new SecurityException("Call IDs may only contain Java Identifiers");
+            }
+
+            String scriptName = (String) paramMap.remove(prefix + ProtocolConstants.INBOUND_KEY_SCRIPTNAME);
+            call.setScriptName(scriptName);
+            if (!LocalUtil.isLetterOrDigitOrUnderline(scriptName))
+            {
+                throw new SecurityException("Script names may only contain Java Identifiers");
+            }
+
+            String methodName = (String) paramMap.remove(prefix + ProtocolConstants.INBOUND_KEY_METHODNAME);
+            call.setMethodName(methodName);
+            if (!LocalUtil.isLetterOrDigitOrUnderline(methodName))
+            {
+                throw new SecurityException("Method names may only contain Java Identifiers");
+            }
 
             // Look for parameters to this method
             for (Iterator it = paramMap.entrySet().iterator(); it.hasNext();)
@@ -285,7 +302,13 @@ public class Batch
             }
         }
 
-        calls.setBatchId((String) paramMap.remove(ProtocolConstants.INBOUND_KEY_BATCHID));
+        String batchId = (String) paramMap.remove(ProtocolConstants.INBOUND_KEY_BATCHID);
+        calls.setBatchId(batchId);
+        if (!LocalUtil.isLetterOrDigitOrUnderline(batchId))
+        {
+            throw new SecurityException("Batch IDs may only contain Java Identifiers");
+        }
+
         httpSessionId = (String) paramMap.remove(ProtocolConstants.INBOUND_KEY_HTTP_SESSIONID);
         scriptSessionId = (String) paramMap.remove(ProtocolConstants.INBOUND_KEY_SCRIPT_SESSIONID);
         page = (String) paramMap.remove(ProtocolConstants.INBOUND_KEY_PAGE);

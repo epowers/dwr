@@ -143,7 +143,7 @@ public abstract class AbstractOutboundVariable implements OutboundVariable
         if (reference == null)
         {
             reference = new ReferenceOutboundVariable(getVariableName());
-            if (forcedInlineStatus)
+            if (forcedInlineStatus && inline)
             {
                 throw new IllegalStateException("Ignoring request to inline on reference for: " + this);
             }
