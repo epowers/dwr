@@ -40,7 +40,11 @@ public class TimedAlarm extends BasicAlarm implements Alarm
      */
     public void cancel()
     {
-        task.cancel();
+        if (task != null)
+        {
+            task.cancel();
+        }
+
         super.cancel();
     }
 
@@ -54,23 +58,31 @@ public class TimedAlarm extends BasicAlarm implements Alarm
             throw new IllegalStateException("An alarm action has already been set.");
         }
 
-        task = new TimerTask()
-        {
-            public void run()
-            {
-                try
-                {
-                    raiseAlarm();
-                }
-                catch (Exception ex)
-                {
-                    log.warn("Unexpected error raising alarm", ex);
-                }
-            }
-        };
-
-        StaticTimer.schedule(task, waitTime);
         super.setAlarmAction(sleeper);
+
+        if (waitTime == 0)
+        {
+            raiseAlarm();
+        }
+        else
+        {
+            task = new TimerTask()
+            {
+                public void run()
+                {
+                    try
+                    {
+                        raiseAlarm();
+                    }
+                    catch (Exception ex)
+                    {
+                        log.warn("Unexpected error raising alarm", ex);
+                    }
+                }
+            };
+    
+            StaticTimer.schedule(task, waitTime);
+        }
     }
 
     /**

@@ -34,13 +34,16 @@ public class JettyContinuationSleeper implements Sleeper
     {
         continuation = new Continuation(request);
 
+        // At this point JettyContinuationSleeper is fully initialized so it is
+        // safe to allow other classes to see and use us.
+        //noinspection ThisEscapedInObjectConstruction
         request.setAttribute(ATTRIBUTE_JETTY_CONDUIT, this);
     }
 
     /**
      * Is this a restarted continuation?
      * @param request The request on which a Sleeper might be stored
-     * @return true if this request is from a restarted Contiuation
+     * @return true if this request is from a restarted Continuation
      */
     public static boolean isRestart(HttpServletRequest request)
     {
@@ -70,20 +73,31 @@ public class JettyContinuationSleeper implements Sleeper
     {
         this.onAwakening = awakening;
 
-        try
+        synchronized (wakeUpCalledLock)
         {
-            // JETTY: throws a RuntimeException that must propogate to the container!
-            // The docs say that a value of 0 should suspend forever, but that
-            // appears not to happen (at least in 6.1.1) so we suspend for BigNum
-            continuation.suspend(Integer.MAX_VALUE);
-        }
-        catch (Exception ex)
-        {
-            Continuation.rethrowIfContinuation(ex);
-
-            log.warn("Exception", ex);
-            proxy = new ThreadWaitSleeper();
-            proxy.goToSleep(onAwakening);
+            if (wakeUpCalled)
+            {
+                onAwakening.run();
+            }
+            else
+            {
+                try
+                {
+                    // This throws a RuntimeException that must propagate to the
+                    // container. The docs say that a value of 0 should suspend
+                    // forever, but that did not to happen in 6.1.1 so we
+                    // suspend for BigNum
+                    continuation.suspend(Integer.MAX_VALUE);
+                }
+                catch (Exception ex)
+                {
+                    Continuation.rethrowIfContinuation(ex);
+        
+                    log.warn("Exception", ex);
+                    proxy = new ThreadWaitSleeper();
+                    proxy.goToSleep(onAwakening);
+                }
+            }
         }
     }
 
@@ -92,30 +106,51 @@ public class JettyContinuationSleeper implements Sleeper
      */
     public void wakeUp()
     {
-        if (proxy != null)
+        synchronized (wakeUpCalledLock)
         {
-            proxy.wakeUp();
-        }
-        else
-        {
-            synchronized (continuation)
+            if (wakeUpCalled)
             {
-                if (!resumed)
-                {
-                    try
-                    {
-                        continuation.resume();
-                    }
-                    catch (Exception ex)
-                    {
-                        log.error("Broken reflection", ex);
-                    }
+                return;
+            }
 
-                    resumed = true;
+            wakeUpCalled = true;
+
+            if (proxy != null)
+            {
+                proxy.wakeUp();
+            }
+            else
+            {
+                synchronized (continuation)
+                {
+                    if (!resumed)
+                    {
+                        try
+                        {
+                            continuation.resume();
+                        }
+                        catch (Exception ex)
+                        {
+                            log.error("Broken reflection", ex);
+                        }
+    
+                        resumed = true;
+                    }
                 }
             }
         }
     }
+
+    /**
+     * All operations that involve going to sleep of waking up must hold this
+     * lock before they take action.
+     */
+    private Object wakeUpCalledLock = new Object();
+
+    /**
+     * Has wakeUp been called?
+     */
+    private boolean wakeUpCalled = false;
 
     /**
      * If continuations fail, we proxy to a Thread Wait version
