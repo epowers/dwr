@@ -680,25 +680,12 @@ dwr.engine._sendData = function(batch) {
   }
   else if (batch.rpcType != dwr.engine.ScriptTag) {
     var idname = batch.isPoll ? "dwr-if-poll-" + batch.map.batchId : "dwr-if-" + batch.map["c0-id"];
-    // on IE try to use the htmlfile activex control
-    if (batch.isPoll && window.ActiveXObject) {
-      batch.htmlfile = new window.ActiveXObject("htmlfile");
-      batch.htmlfile.open();
-      batch.htmlfile.write("<html>");
-      //batch.htmlfile.write("<script>document.domain='" + document.domain + "';</script>");
-      batch.htmlfile.write("<div><iframe className='wibble' src='javascript:void(0)' id='" + idname + "' name='" + idname + "' onload='dwr.engine._iframeLoadingComplete(" + batch.map.batchId + ");'></iframe></div>");
-      batch.htmlfile.write("</html>");
-      batch.htmlfile.close();
-      batch.htmlfile.parentWindow.dwr = dwr;
-      batch.document = batch.htmlfile;
-    }
-    else {
-      batch.div = document.createElement("div");
-      // Add the div to the document first, otherwise IE 6 will ignore onload handler.
-      document.body.appendChild(batch.div);
-      batch.div.innerHTML = "<iframe src='javascript:void(0)' frameborder='0' style='width:0px;height:0px;border:0;' id='" + idname + "' name='" + idname + "' onload='dwr.engine._iframeLoadingComplete (" + batch.map.batchId + ");'></iframe>";
-      batch.document = document;
-    }
+    // Removed htmlfile implementation. Don't expect it to return before v3
+    batch.div = document.createElement("div");
+    // Add the div to the document first, otherwise IE 6 will ignore onload handler.
+    document.body.appendChild(batch.div);
+    batch.div.innerHTML = "<iframe src='javascript:void(0)' frameborder='0' style='width:0px;height:0px;border:0;' id='" + idname + "' name='" + idname + "' onload='dwr.engine._iframeLoadingComplete (" + batch.map.batchId + ");'></iframe>";
+    batch.document = document;
     batch.iframe = batch.document.getElementById(idname);
     batch.iframe.batch = batch;
     batch.mode = batch.isPoll ? dwr.engine._ModeHtmlPoll : dwr.engine._ModeHtmlCall;
