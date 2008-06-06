@@ -15,22 +15,18 @@
  */
 package org.directwebremoting.guice;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-import com.google.inject.ScopeAnnotation;
+import com.google.inject.Provider;
+
+import java.util.concurrent.Future;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
 
 /**
- * Marks classes for which there should be one instance per web application 
- * (i.e., per servlet context) and these instances should be created eagerly
- * at servlet {@code init()} and closed (when they implement {@code Closeable}) 
- * at servlet {@code destroy()}.
+ * Marker interface for {@link ContextRegistry} implementations to recognize
+ * registered instance providers.
  * @author Tim Peierls [tim at peierls dot net]
  */
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-@ScopeAnnotation
-public @interface ApplicationScoped
+public interface InstanceProvider<T> extends Provider<T>, Runnable
 {
+    void run();
 }

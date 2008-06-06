@@ -15,22 +15,25 @@
  */
 package org.directwebremoting.guice;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-import com.google.inject.ScopeAnnotation;
-
 /**
- * Marks classes for which there should be one instance per web application 
- * (i.e., per servlet context) and these instances should be created eagerly
- * at servlet {@code init()} and closed (when they implement {@code Closeable}) 
- * at servlet {@code destroy()}.
+ * A partially implemented handler for objects contained in contexts that 
+ * are closing. Concrete extensions of this class only have to define 
+ * {@code close} and have a constructor that calls {@code super(T.class)}.
  * @author Tim Peierls [tim at peierls dot net]
  */
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-@ScopeAnnotation
-public @interface ApplicationScoped
-{
+public abstract class AbstractContextCloseHandler<T> implements ContextCloseHandler<T>
+{   
+    protected AbstractContextCloseHandler(Class<T> type)
+    {
+        this.type = type;
+    }
+    
+    public abstract void close(T object) throws Exception;
+    
+    public Class<T> type()
+    {
+        return type;
+    }
+    
+    private final Class<T> type;
 }

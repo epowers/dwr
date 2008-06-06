@@ -15,22 +15,22 @@
  */
 package org.directwebremoting.guice;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-import com.google.inject.ScopeAnnotation;
+import com.google.inject.Key;
+import com.google.inject.Scope;
 
 /**
- * Marks classes for which there should be one instance per web application 
- * (i.e., per servlet context) and these instances should be created eagerly
- * at servlet {@code init()} and closed (when they implement {@code Closeable}) 
- * at servlet {@code destroy()}.
+ * Thrown by Providers returned by 
+ * {@link com.google.inject.Scope#scope scope(Key, Provider)}
+ * when they cannot locate a resource needed to resolve a key.
  * @author Tim Peierls [tim at peierls dot net]
  */
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-@ScopeAnnotation
-public @interface ApplicationScoped
+public class OutOfScopeException extends RuntimeException
 {
+    public OutOfScopeException(Scope scope, Key<?> key, Throwable cause) 
+    {
+        super(String.format(
+            "Not in scope %s for key %s: caused by %s",
+            scope, key, cause
+        ), cause);
+    }
 }
