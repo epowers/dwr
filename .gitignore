@@ -1,0 +1,44 @@
+
+# /
+/target
+/dwr.iml
+/dwr.ipr
+/dwr.iws
+/monitor
+/.myumldata
+
+# /core/
+/core/target
+
+# /core/impl/demo/web/WEB-INF/
+/core/impl/demo/web/WEB-INF/classes
+
+# /core/impl/demo/web/WEB-INF/lib/
+/core/impl/demo/web/WEB-INF/lib/commons-logging.jar
+/core/impl/demo/web/WEB-INF/lib/log4j-1.2.12.jar
+
+# /etc/
+/etc/local
+
+# /etc/netbeans/
+/etc/netbeans/dist
+
+# /etc/netbeans/nbproject/
+/etc/netbeans/nbproject/private
+
+# /noncla/various/
+/noncla/various/target
+
+# /ui/dojo/build/
+
+# /ui/dwr/
+/ui/dwr/target
+
+# /ui/gi/
+/ui/gi/target
+
+# /ui/jaxer/customDemo/web/WEB-INF/
+/ui/jaxer/customDemo/web/WEB-INF/classes
+
+# /ui/scriptaculous/
+/ui/scriptaculous/target
